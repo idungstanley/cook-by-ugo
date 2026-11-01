@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand palette, stored as RGB channels so Tailwind opacity modifiers work. */
+    --color-jollof: 200 64 28; /* #C8401C */
+    --color-jollof-dark: 168 51 21;
+    --color-gold: 242 178 62; /* #F2B23E */
+    --color-gold-soft: 251 233 196;
+    --color-ewedu: 30 91 58; /* #1E5B3A */
+    --color-indigo: 35 58 115; /* #233A73 */
+    --color-cocoa: 28 15 10; /* #1C0F0A */
+    --color-cocoa-soft: 42 28 22;
+    --color-shea: 246 237 224; /* #F6EDE0 */
+    --color-paper: 255 250 242; /* #FFFAF2 */
+    --color-muted: 107 93 82;
+    --color-line: 229 216 198;
+    --color-whatsapp: 37 211 102;
+
+    --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+    --font-accent: 'Fraunces Variable', Georgia, serif;
+    --font-body: 'Manrope Variable', system-ui, sans-serif;
+
+    --site-max-width: 1440px;
+    --radius-card: 1.5rem;
+    --radius-panel: 2.5rem;
+  }
+
+  html {
+    @apply scroll-smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-shea font-body text-cocoa antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-extrabold;
+    letter-spacing: -0.035em;
+  }
+
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-jollof;
+  }
+
+  dialog::backdrop {
+    background: rgb(var(--color-cocoa) / 0.55);
+    animation: fade-in 200ms ease-out;
+  }
+}
+
+@layer components {
+  /* Aso-oke woven strip from the brand pattern kit. */
+  .band-aso-oke {
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgb(var(--color-gold)) 0 16px,
+      rgb(var(--color-cocoa)) 16px 20px,
+      rgb(var(--color-ewedu)) 20px 34px,
+      rgb(var(--color-shea)) 34px 37px,
+      rgb(var(--color-jollof)) 37px 53px,
+      rgb(var(--color-shea)) 53px 56px,
+      rgb(var(--color-indigo)) 56px 66px
+    );
+  }
+
+  /* Adire dot grid from the brand pattern kit. */
+  .pattern-adire {
+    background-image:
+      radial-gradient(circle, rgb(var(--color-gold) / 0.5) 0 5px, transparent 6px),
+      radial-gradient(
+        circle,
+        transparent 0 16px,
+        rgb(var(--color-shea) / 0.22) 17px 18px,
+        transparent 19px
+      );
+    background-size: 56px 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
