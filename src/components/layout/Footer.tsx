@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { AsoOkeBand } from '@/components/brand/AsoOkeBand'
+import { LogoMark } from '@/components/brand/LogoMark'
 import { buttonStyles } from '@/components/ui/button.styles'
 import { Container } from '@/components/ui/Container'
 import { FOOTER_NAV } from '@/constants/navigation'
@@ -16,6 +17,7 @@ export const Footer = () => {
       <Container className="pt-14 md:pt-16">
         <div className="flex flex-col gap-10 lg:flex-row lg:justify-between">
           <div>
+            <LogoMark onDark className="mb-4 size-28 md:size-28" />
             <p className="max-w-xs text-lg leading-snug">
               Authentic Nigerian home cooking, delivered across Newcastle.
             </p>
