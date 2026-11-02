@@ -5,5 +5,7 @@ export const queryKeys = {
   favourites: ['menu', 'favourites'] as const,
   deals: ['deals'] as const,
   siteInfo: ['site-info'] as const,
+  slots: ['slots'] as const,
+  quote: (items: unknown, postcode: string) => ['quote', items, postcode] as const,
   order: (orderId: string) => ['orders', orderId] as const,
 }

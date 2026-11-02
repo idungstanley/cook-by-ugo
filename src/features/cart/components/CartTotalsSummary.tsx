@@ -1,4 +1,3 @@
-import { FREE_DELIVERY_THRESHOLD } from '@/constants/checkout'
 import { formatPrice } from '@/lib/format'
 import type { CartTotals } from '@/types'
 
@@ -9,7 +8,7 @@ export const FreeDeliveryBar = ({ totals }: { totals: CartTotals }) => {
     <div>
       <p className="mb-2 text-xs font-semibold text-ewedu">
         {unlocked
-          ? `Free delivery unlocked on orders over ${formatPrice(FREE_DELIVERY_THRESHOLD)}`
+          ? 'Free delivery unlocked'
           : `Add ${formatPrice(totals.amountToFreeDelivery)} more for free delivery`}
       </p>
       <div className="h-1.5 overflow-hidden rounded-full bg-line">
@@ -29,13 +28,13 @@ export const CartTotalsSummary = ({ totals }: { totals: CartTotals }) => (
       <dd>{formatPrice(totals.subtotal)}</dd>
     </div>
     <div className="flex justify-between border-b border-line pb-3">
-      <dt className="text-muted">Delivery</dt>
+      <dt className="text-muted">Delivery (estimate)</dt>
       <dd className={totals.deliveryFee === 0 ? 'font-semibold text-ewedu' : ''}>
         {totals.deliveryFee === 0 ? 'Free' : formatPrice(totals.deliveryFee)}
       </dd>
     </div>
     <div className="flex items-center justify-between pt-1">
-      <dt className="font-display text-lg font-extrabold">Total</dt>
+      <dt className="font-display text-lg font-extrabold">Estimated total</dt>
       <dd className="font-display text-2xl font-extrabold">{formatPrice(totals.total)}</dd>
     </div>
   </dl>

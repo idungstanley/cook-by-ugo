@@ -1,4 +1,5 @@
-import type { CartItem, CartTotals } from './cart'
+import type { CartItem } from './cart'
+import type { Pence } from './menu'
 
 export type PaymentMethod = 'card' | 'on-delivery'
 
@@ -12,23 +13,48 @@ export interface DeliveryDetails {
   city: string
   postcode: string
   timing: DeliveryTiming
-  scheduledSlot?: string
+  scheduledFor?: number
   note?: string
+  allergyNote?: string
+  marketingOptIn: boolean
 }
 
-export type OrderStatus = 'received' | 'preparing' | 'out-for-delivery' | 'delivered'
+export type OrderStatus =
+  'pending-payment' | 'received' | 'preparing' | 'out-for-delivery' | 'delivered' | 'cancelled'
+
+export type OrderLineInput = Pick<CartItem, 'productId' | 'quantity' | 'selection'>
 
 export interface CreateOrderInput {
-  items: CartItem[]
-  totals: CartTotals
-  delivery: DeliveryDetails
+  idempotencyKey: string
+  items: OrderLineInput[]
+  postcode: string
   paymentMethod: PaymentMethod
+  delivery: Omit<DeliveryDetails, 'postcode' | 'timing'>
 }
 
-export interface Order extends CreateOrderInput {
+export interface OrderQuote {
+  subtotal: Pence
+  deliveryFee: Pence
+  total: Pence
+}
+
+export interface PlacedOrder {
+  order: { id: string; number: string; status: OrderStatus; etaMinutes: number; total: Pence }
+  trackingKey: string
+  clientSecret?: string
+}
+
+export interface TrackedOrder {
   id: string
   number: string
   status: OrderStatus
+  etaMinutes: number
+}
+
+export interface Order {
+  id: string
+  number: string
+  status: OrderStatus
+  trackingKey: string
   etaLabel: string
-  createdAt: number
 }

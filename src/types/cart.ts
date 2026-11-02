@@ -9,11 +9,14 @@ export interface CartItem {
   unitPrice: Pence
   quantity: number
   summary?: string
+  /** Chosen option ids by group. The server prices the order from these. */
+  selection: Record<string, string[]>
 }
 
-export type NewCartItem = Omit<CartItem, 'id' | 'quantity'> & {
+export type NewCartItem = Omit<CartItem, 'id' | 'quantity' | 'selection'> & {
   quantity?: number
   optionKey?: string
+  selection?: Record<string, string[]>
 }
 
 export interface CartTotals {

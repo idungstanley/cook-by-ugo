@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { optionGroups } from '@/mocks/menu'
 import {
   getFirstMissingGroup,
   getInitialSelection,
@@ -7,6 +6,7 @@ import {
   getUnitPrice,
   toggleChoice,
 } from './dishSelection'
+import { optionGroups } from './dishSelection.fixtures'
 
 const [protein, sides, spice] = optionGroups as [
   (typeof optionGroups)[number],

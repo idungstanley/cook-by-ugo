@@ -9,6 +9,7 @@ const delivery = {
   city: 'Newcastle upon Tyne',
   postcode: 'NE1 4ST',
   timing: 'asap',
+  marketingOptIn: false,
 }
 
 describe('delivery schema', () => {
@@ -16,14 +17,9 @@ describe('delivery schema', () => {
     expect(deliverySchema.safeParse(delivery).success).toBe(true)
   })
 
-  it('rejects valid postcodes outside the delivery area', () => {
-    const result = deliverySchema.safeParse({ ...delivery, postcode: 'SW1A 1AA' })
-    expect(result.error?.issues[0]?.message).toContain('NE postcodes')
-  })
-
   it('requires a slot for scheduled orders', () => {
     const result = deliverySchema.safeParse({ ...delivery, timing: 'scheduled' })
-    expect(result.error?.issues[0]?.path).toEqual(['scheduledSlot'])
+    expect(result.error?.issues[0]?.path).toEqual(['scheduledFor'])
   })
 })
 

@@ -1,6 +1,6 @@
-import { deals } from '@/mocks/deals'
-import { mockRequest } from '@/services/mockClient'
+import { http } from '@/lib/http'
+import type { Deal } from '@/types'
 
 export const dealsApi = {
-  getDeals: () => mockRequest(deals),
+  getDeals: () => http.get<Deal[]>('/deals'),
 }

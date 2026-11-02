@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { DELIVERY_POSTCODE_PREFIX } from '@/constants/checkout'
 
 const UK_PHONE = /^(\+44\s?|0)7\d{3}\s?\d{6}$|^(\+44\s?|0)\d{2,4}\s?\d{3,4}\s?\d{3,4}$/
 const UK_POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i
@@ -11,19 +10,15 @@ export const deliverySchema = z
     phone: z.string().trim().regex(UK_PHONE, 'Enter a valid UK phone number'),
     address: z.string().trim().min(4, 'Enter your street address'),
     city: z.string().trim().min(2, 'Enter your city'),
-    postcode: z
-      .string()
-      .trim()
-      .regex(UK_POSTCODE, 'Enter a valid postcode')
-      .refine((value) => value.toUpperCase().startsWith(DELIVERY_POSTCODE_PREFIX), {
-        message: 'Sorry, we only deliver to NE postcodes for now',
-      }),
+    postcode: z.string().trim().regex(UK_POSTCODE, 'Enter a valid postcode'),
     timing: z.enum(['asap', 'scheduled']),
-    scheduledSlot: z.string().optional(),
+    scheduledFor: z.coerce.number().optional(),
     note: z.string().trim().max(200, 'Keep your note under 200 characters').optional(),
+    allergyNote: z.string().trim().max(200, 'Keep this under 200 characters').optional(),
+    marketingOptIn: z.boolean(),
   })
-  .refine((value) => value.timing === 'asap' || Boolean(value.scheduledSlot), {
-    path: ['scheduledSlot'],
+  .refine((value) => value.timing === 'asap' || Boolean(value.scheduledFor), {
+    path: ['scheduledFor'],
     message: 'Choose a delivery time',
   })
 
@@ -38,4 +33,5 @@ export const cardSchema = z.object({
 })
 
 export type DeliveryFormValues = z.infer<typeof deliverySchema>
+export type DeliveryFormInput = z.input<typeof deliverySchema>
 export type CardFormInput = z.input<typeof cardSchema>

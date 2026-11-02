@@ -1,6 +1,7 @@
-import { siteInfo } from '@/mocks/site'
-import { mockRequest } from '@/services/mockClient'
+import { http } from '@/lib/http'
+import type { DeliverySlot, SiteInfo } from '@/types'
 
 export const siteApi = {
-  getSiteInfo: () => mockRequest(siteInfo),
+  getSiteInfo: () => http.get<SiteInfo>('/site'),
+  getSlots: () => http.get<DeliverySlot[]>('/slots'),
 }

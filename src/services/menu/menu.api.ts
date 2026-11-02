@@ -1,9 +1,9 @@
-import { categories, dishes, favourites, optionGroups } from '@/mocks/menu'
-import { mockRequest } from '@/services/mockClient'
+import { http } from '@/lib/http'
+import type { Category, Dish, FavouriteDish, OptionGroup } from '@/types'
 
 export const menuApi = {
-  getCategories: () => mockRequest(categories),
-  getDishes: () => mockRequest(dishes),
-  getOptionGroups: () => mockRequest(optionGroups),
-  getFavourites: () => mockRequest(favourites),
+  getCategories: () => http.get<Category[]>('/categories'),
+  getDishes: () => http.get<Dish[]>('/dishes'),
+  getOptionGroups: () => http.get<OptionGroup[]>('/option-groups'),
+  getFavourites: () => http.get<FavouriteDish[]>('/favourites'),
 }

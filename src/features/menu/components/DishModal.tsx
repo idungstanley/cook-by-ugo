@@ -48,6 +48,7 @@ const DishForm = ({ dish, groups, isMostOrdered, onClose }: DishFormProps) => {
       quantity,
       summary,
       optionKey,
+      selection,
     })
     onClose()
   }

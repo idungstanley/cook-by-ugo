@@ -16,7 +16,7 @@ interface ConfirmationStepProps {
 
 export const ConfirmationStep = ({ order, onDone }: ConfirmationStepProps) => {
   const navigate = useNavigate()
-  const { data: liveOrder } = useOrder(order.id)
+  const { data: liveOrder } = useOrder(order.id, order.trackingKey)
   const { data: site } = useSiteInfo()
   const status = liveOrder?.status ?? order.status
 

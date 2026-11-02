@@ -22,6 +22,6 @@ export const useCartStore = create<CartState>()(
         set((state) => ({ items: state.items.filter(({ id }) => id !== itemId) })),
       clear: () => set({ items: [] }),
     }),
-    { name: 'cook-by-ugo-cart' },
+    { name: 'cook-by-ugo-cart-v2' },
   ),
 )

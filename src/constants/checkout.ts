@@ -1,9 +1,8 @@
 import type { OrderStatus } from '@/types'
 
-/** Mock values until the delivery fee and zones are agreed with the client. */
+/** Basket estimates only. Real fees come from the delivery zones on the server. */
 export const FREE_DELIVERY_THRESHOLD = 2500
 export const DELIVERY_FEE = 299
-export const DELIVERY_POSTCODE_PREFIX = 'NE'
 export const DEFAULT_CITY = 'Newcastle upon Tyne'
 export const ASAP_LABEL = '35 to 45 min'
 
@@ -16,14 +15,6 @@ export const CHECKOUT_STEPS = [
 ] as const
 
 export type CheckoutStep = (typeof CHECKOUT_STEPS)[number]['id']
-
-export const SCHEDULED_SLOTS = [
-  'Today, 6:00pm',
-  'Today, 6:30pm',
-  'Today, 7:00pm',
-  'Today, 7:30pm',
-  'Today, 8:00pm',
-] as const
 
 export const ORDER_STAGES: { status: OrderStatus; title: string; body: string }[] = [
   { status: 'received', title: 'Order received', body: 'We have got your order' },

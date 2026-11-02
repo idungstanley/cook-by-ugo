@@ -2,11 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { Button } from '@/components/ui/Button'
 import { SelectField, TextAreaField, TextField } from '@/components/ui/fields'
-import { ASAP_LABEL, DEFAULT_CITY, SCHEDULED_SLOTS } from '@/constants/checkout'
+import { ASAP_LABEL, DEFAULT_CITY } from '@/constants/checkout'
 import { cn } from '@/lib/cn'
+import { useDeliverySlots, useSiteInfo } from '@/services/site/site.queries'
 import { useCheckoutStore } from '@/stores/checkout.store'
 import type { DeliveryTiming } from '@/types'
-import { deliverySchema, type DeliveryFormValues } from '../checkout.schema'
+import { deliverySchema, type DeliveryFormInput, type DeliveryFormValues } from '../checkout.schema'
 
 const TIMING_OPTIONS: { value: DeliveryTiming; label: string }[] = [
   { value: 'asap', label: `ASAP · ${ASAP_LABEL}` },
@@ -22,11 +23,13 @@ export const DeliveryStep = () => {
     control,
     setValue,
     formState: { errors },
-  } = useForm<DeliveryFormValues>({
+  } = useForm<DeliveryFormInput, unknown, DeliveryFormValues>({
     resolver: zodResolver(deliverySchema),
-    defaultValues: savedDelivery ?? { city: DEFAULT_CITY, timing: 'asap' },
+    defaultValues: savedDelivery ?? { city: DEFAULT_CITY, timing: 'asap', marketingOptIn: false },
   })
   const timing = useWatch({ control, name: 'timing' })
+  const { data: slots } = useDeliverySlots()
+  const { data: site } = useSiteInfo()
 
   return (
     <form
@@ -104,22 +107,44 @@ export const DeliveryStep = () => {
       {timing === 'scheduled' && (
         <SelectField
           label="Choose a time"
-          error={errors.scheduledSlot?.message}
-          {...register('scheduledSlot')}
+          error={errors.scheduledFor?.message}
+          {...register('scheduledFor')}
         >
-          <option value="">Select a slot</option>
-          {SCHEDULED_SLOTS.map((slot) => (
-            <option key={slot}>{slot}</option>
+          <option value="">{slots?.length ? 'Select a slot' : 'No slots left today'}</option>
+          {slots?.map(({ at, label }) => (
+            <option key={at} value={at}>
+              {label}
+            </option>
           ))}
         </SelectField>
       )}
 
       <TextAreaField
         label="Delivery note (optional)"
-        placeholder="Ring the bell, leave at the door, allergies..."
+        placeholder="Ring the bell, leave at the door..."
         error={errors.note?.message}
         {...register('note')}
       />
+
+      <TextField
+        label="Allergies (optional)"
+        placeholder="Tell us about any food allergy"
+        error={errors.allergyNote?.message}
+        {...register('allergyNote')}
+      />
+
+      <label className="flex items-start gap-2.5 text-sm">
+        <input type="checkbox" className="mt-0.5 size-4" {...register('marketingOptIn')} />
+        Send me offers by email. You can unsubscribe at any time.
+      </label>
+
+      {site && !site.isOpen && timing === 'asap' && (
+        <p role="alert" className="text-sm font-semibold text-jollof">
+          {site.ordersPaused
+            ? 'We are not taking orders right now.'
+            : 'We are closed right now. Please schedule your order for later.'}
+        </p>
+      )}
 
       <div className="mt-auto pt-2 text-center">
         <Button type="submit" size="lg" fullWidth>

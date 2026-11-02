@@ -6,6 +6,14 @@ import type { OrderStatus } from '@/types'
 export const OrderTracker = ({ status }: { status: OrderStatus }) => {
   const currentIndex = ORDER_STAGES.findIndex((stage) => stage.status === status)
 
+  if (status === 'cancelled') {
+    return (
+      <p role="status" className="rounded-2xl bg-gold-soft p-4 text-sm font-semibold">
+        This order was cancelled. Any card payment has been refunded.
+      </p>
+    )
+  }
+
   return (
     <ol aria-label="Order progress">
       {ORDER_STAGES.map((stage, index) => {

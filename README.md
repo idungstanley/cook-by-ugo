@@ -1,7 +1,7 @@
 # Cook by Ugo
 
-Customer ordering website for Cook by Ugo, built from the Figma design. This is the frontend only:
-all data is mocked, no payment is taken and no order leaves the browser.
+Customer ordering website for Cook by Ugo, built from the Figma design. Menu, prices and orders come
+from the [API](https://github.com/idungstanley/api-cooked-by-ugo).
 
 ## Stack
 
@@ -14,8 +14,11 @@ all data is mocked, no payment is taken and no order leaves the browser.
 
 ## Getting started
 
+Start the API first, then:
+
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
 
@@ -38,7 +41,6 @@ src/
   features/     Feature components and their logic: cart, checkout, home, menu
   hooks/        Reusable hooks
   lib/          Small helpers: formatting, class names, query client
-  mocks/        Sample data from the design
   routes/       TanStack Router pages
   services/     One folder per domain: `*.api.ts` and `*.queries.ts`
   stores/       Zustand stores
@@ -51,24 +53,17 @@ src/
 - **Colours:** add or change a colour in `src/styles/globals.css`, then expose it in
   `tailwind.config.ts`. Use classes such as `bg-jollof` and never hard-code a hex value.
 - **Money:** always whole pence, formatted with `formatPrice`.
-- **Data:** components call query hooks from `src/services`, never the mocks directly.
+- **Data:** components call query hooks from `src/services`. Only `*.api.ts` files call the API.
 
-## Connecting the backend
+## Before launch
 
-The `*.api.ts` files are the only ones that touch mock data. Replace each method with an Appwrite
-call and the query hooks and components stay the same. Then:
-
-- Move price and total calculation to the server. The browser totals are for display only.
-- Replace `CardFields` with Stripe's Payment Element. Its mock fields must never go live.
-- Replace order polling with Appwrite Realtime.
-
-## Placeholders to replace before launch
-
-- **Allergens:** the lists in `src/mocks/menu.ts` are not verified. Use the kitchen's real data.
-- **Delivery:** the £2.99 fee and NE postcode rule in `src/constants/checkout.ts` are assumptions.
+- **Card payments:** replace `CardFields` with Stripe's Payment Element, using the `clientSecret`
+  the API returns. The fields here are placeholders and send nothing. In production a card order
+  stays unpaid until this is done, and the page tells the customer to pay on delivery.
+- **Allergens:** the seeded lists are not verified. Update them in the admin dashboard.
 - **Contact details:** the phone number, email and WhatsApp number are from the design.
 - **Images:** these are screen captures from Figma. Export the originals, and check that each photo
   matches its dish.
-- **Time slots:** the options in `SCHEDULED_SLOTS` are a fixed list.
 - **Deals:** "Order" adds the deal straight to the cart until the deal builder is designed.
-- **Info pages:** Catering, Contact, Delivery areas, Allergens, Privacy and Our story are stubs.
+- **Info pages:** Catering, Contact, Delivery areas, Allergens, Privacy and Our story are stubs. The
+  API already accepts catering enquiries at `POST /api/public/enquiries`.

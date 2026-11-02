@@ -7,6 +7,7 @@ import { useOpeningStatus } from '@/hooks/useOpeningStatus'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
 import { useDishes } from '@/services/menu/menu.queries'
+import { useSiteInfo } from '@/services/site/site.queries'
 import { useUiStore } from '@/stores/ui.store'
 
 const HERO_DISH_ID = 'party-jollof-rice'
@@ -37,8 +38,16 @@ const HeroDishChip = () => {
   )
 }
 
+/** The last word of the headline takes the accent style from the design. */
+const splitHeadline = (headline: string) => {
+  const words = headline.trim().split(' ')
+  return { lead: words.slice(0, -1).join(' '), accent: words.at(-1) }
+}
+
 export const Hero = () => {
   const { isOpen } = useOpeningStatus()
+  const { data: site } = useSiteInfo()
+  const { lead, accent } = splitHeadline(site?.heroHeadline ?? '')
 
   return (
     <section>
@@ -56,15 +65,14 @@ export const Hero = () => {
           </p>
 
           <h1 className="mt-4 text-[3.1rem] leading-[0.98] sm:text-7xl xl:text-[6.25rem]">
-            Lagos flavour, Newcastle
+            {lead}
             <span className="block font-accent font-semibold italic tracking-normal text-jollof">
-              doorstep.
+              {accent}
             </span>
           </h1>
 
           <p className="mt-5 max-w-md text-[17px] leading-relaxed text-cocoa/80">
-            Jollof, suya, egusi and dodo, cooked from scratch every day by Ugo and delivered hot in
-            35 to 45 minutes.
+            {site?.heroText}
           </p>
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
