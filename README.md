@@ -67,3 +67,9 @@ src/
 - **Deals:** "Order" adds the deal straight to the cart until the deal builder is designed.
 - **Info pages:** Catering, Contact, Delivery areas, Allergens, Privacy and Our story are stubs. The
   API already accepts catering enquiries at `POST /api/public/enquiries`.
+
+## Deploying
+
+Set `VITE_API_URL` to `https://api.cookedbyugo.com` before building, then publish `dist`. Every path
+must serve `index.html`. Netlify reads this from `public/_redirects`, and other hosts need a rewrite
+rule from `/*` to `/index.html`.
