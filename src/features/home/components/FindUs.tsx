@@ -21,9 +21,12 @@ export const FindUs = () => {
 
             <dl className="mt-6 max-w-md">
               {site?.hours.map(({ label, hoursLabel }) => (
-                <div key={label} className="flex justify-between border-b border-line py-3">
+                <div
+                  key={label}
+                  className="grid grid-cols-[7.5rem_1fr] items-baseline gap-4 border-b border-line py-3"
+                >
                   <dt className="font-medium">{label}</dt>
-                  <dd className="font-bold">{hoursLabel}</dd>
+                  <dd className="font-bold tabular-nums">{hoursLabel}</dd>
                 </div>
               ))}
             </dl>

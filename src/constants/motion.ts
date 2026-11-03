@@ -27,3 +27,4 @@ export const stagger = (gap = 0.08, delay = 0): Variants => ({
 /** Lift and press feedback shared by cards and buttons. */
 export const CARD_HOVER = { y: -6, transition: SPRING }
 export const PRESS = { scale: 0.94 }
+export const HOVER_GROW = { scale: 1.08, transition: SPRING }

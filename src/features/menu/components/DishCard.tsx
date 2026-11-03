@@ -1,7 +1,7 @@
 import { Plus } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Tag } from '@/components/ui/Tag'
-import { CARD_HOVER, fadeUp, PRESS } from '@/constants/motion'
+import { CARD_HOVER, fadeUp, HOVER_GROW, PRESS } from '@/constants/motion'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
 import { useUiStore } from '@/stores/ui.store'
@@ -95,12 +95,13 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
           </p>
           <motion.button
             type="button"
+            whileHover={dish.soldOut ? undefined : HOVER_GROW}
             whileTap={PRESS}
             disabled={dish.soldOut}
             aria-label={`Add ${dish.name}`}
             onClick={() => openDish(dish.id)}
             className={cn(
-              'hidden h-9 shrink-0 items-center gap-1 rounded-full bg-jollof px-4 text-sm font-bold text-white transition hover:bg-jollof-dark disabled:bg-cocoa/20',
+              'hidden h-9 shrink-0 items-center gap-1 rounded-full bg-jollof px-4 text-sm font-bold text-white transition-colors hover:bg-jollof-dark disabled:bg-cocoa/20',
               isRow ? 'md:inline-flex' : 'inline-flex',
             )}
           >
@@ -112,6 +113,7 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
       {isRow && (
         <motion.button
           type="button"
+          whileHover={dish.soldOut ? undefined : HOVER_GROW}
           whileTap={PRESS}
           disabled={dish.soldOut}
           aria-label={`Add ${dish.name}`}

@@ -31,6 +31,7 @@ export const buttonStyles = ({
 }: ButtonStyleProps = {}) =>
   cn(
     'inline-flex shrink-0 items-center justify-center rounded-full font-body font-bold transition',
+    'duration-200 ease-out hover:scale-105 active:scale-95 disabled:scale-100 motion-reduce:transform-none',
     'disabled:cursor-not-allowed disabled:bg-cocoa/10 disabled:text-muted',
     VARIANTS[variant],
     SIZES[size],

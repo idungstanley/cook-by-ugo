@@ -5,7 +5,7 @@ import { Stagger } from '@/components/motion/Stagger'
 import { buttonStyles } from '@/components/ui/button.styles'
 import { Container } from '@/components/ui/Container'
 import { HERO_STATS } from '@/constants/content'
-import { EASE_OUT, fadeUp, popIn, PRESS, SPRING, stagger } from '@/constants/motion'
+import { EASE_OUT, fadeUp, HOVER_GROW, popIn, PRESS, SPRING, stagger } from '@/constants/motion'
 import { useOpeningStatus } from '@/hooks/useOpeningStatus'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
@@ -36,10 +36,11 @@ const HeroDishChip = () => {
       </div>
       <motion.button
         type="button"
+        whileHover={HOVER_GROW}
         whileTap={PRESS}
         aria-label={`Add ${dish.name}`}
         onClick={() => openDish(dish.id)}
-        className="ml-2 grid size-10 place-items-center rounded-full bg-cocoa text-paper transition hover:bg-jollof"
+        className="ml-2 grid size-10 place-items-center rounded-full bg-cocoa text-paper transition-colors hover:bg-jollof"
       >
         <Plus className="size-5" strokeWidth={3} />
       </motion.button>

@@ -10,7 +10,7 @@ export const Chip = ({ active, className, ...props }: ChipProps) => (
     type="button"
     aria-pressed={active}
     className={cn(
-      'h-10 shrink-0 whitespace-nowrap rounded-full border px-4 text-sm font-semibold transition',
+      'h-10 shrink-0 whitespace-nowrap rounded-full border px-4 text-sm font-semibold transition duration-200 ease-out hover:scale-105 active:scale-95 disabled:scale-100 motion-reduce:transform-none',
       active
         ? 'border-cocoa bg-cocoa text-paper'
         : 'border-line bg-transparent text-cocoa hover:border-cocoa',
