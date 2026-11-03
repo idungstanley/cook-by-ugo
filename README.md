@@ -71,5 +71,4 @@ src/
 ## Deploying
 
 Set `VITE_API_URL` to `https://api.cookedbyugo.com` before building, then publish `dist`. Every path
-must serve `index.html`. Netlify reads this from `public/_redirects`, and other hosts need a rewrite
-rule from `/*` to `/index.html`.
+must serve `index.html`. Vercel reads this from `vercel.json` and Netlify from `public/_redirects`.
