@@ -1,6 +1,6 @@
-# Cook by Ugo
+# Cooked by Ugo
 
-Customer ordering website for Cook by Ugo, built from the Figma design. Menu, prices and orders come
+Customer ordering website for Cooked by Ugo, built from the Figma design. Menu, prices and orders come
 from the [API](https://github.com/idungstanley/api-cooked-by-ugo).
 
 ## Stack

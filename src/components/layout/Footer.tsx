@@ -58,14 +58,14 @@ export const Footer = () => {
             aria-hidden
             className="font-display text-[15vw] font-extrabold leading-[0.85] tracking-tighter xl:text-[188px]"
           >
-            cook by ugo
+            cookedbyugo
           </p>
           <p className="hidden shrink-0 text-xs text-shea/70 lg:block">
-            © {new Date().getFullYear()} Cook by Ugo
+            © {new Date().getFullYear()} Cooked by Ugo
           </p>
         </div>
         <p className="pb-6 text-xs text-shea/70 lg:hidden">
-          © {new Date().getFullYear()} Cook by Ugo
+          © {new Date().getFullYear()} Cooked by Ugo
         </p>
       </Container>
     </footer>

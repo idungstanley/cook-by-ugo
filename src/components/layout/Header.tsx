@@ -1,10 +1,12 @@
 import { Link } from '@tanstack/react-router'
 import { Menu, ShoppingBag } from 'lucide-react'
+import { motion } from 'motion/react'
 import { Logo } from '@/components/brand/Logo'
 import { buttonStyles } from '@/components/ui/button.styles'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { IconButton } from '@/components/ui/IconButton'
+import { SPRING } from '@/constants/motion'
 import { HEADER_NAV } from '@/constants/navigation'
 import { useCartTotals } from '@/hooks/useCartTotals'
 import { useSiteInfo } from '@/services/site/site.queries'
@@ -56,9 +58,15 @@ export const Header = () => {
           >
             <ShoppingBag className="size-5" />
             {itemCount > 0 && (
-              <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-jollof text-[11px] font-bold text-white">
+              <motion.span
+                key={itemCount}
+                initial={{ scale: 1.6 }}
+                animate={{ scale: 1 }}
+                transition={SPRING}
+                className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-jollof text-[11px] font-bold text-white"
+              >
                 {itemCount}
-              </span>
+              </motion.span>
             )}
           </IconButton>
           <IconButton

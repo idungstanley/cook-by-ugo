@@ -1,5 +1,7 @@
 import { Plus } from 'lucide-react'
+import { motion } from 'motion/react'
 import { Tag } from '@/components/ui/Tag'
+import { CARD_HOVER, fadeUp, PRESS } from '@/constants/motion'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
 import { useUiStore } from '@/stores/ui.store'
@@ -21,9 +23,11 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
   const isRow = layout === 'row'
 
   return (
-    <article
+    <motion.article
+      variants={fadeUp}
+      whileHover={CARD_HOVER}
       className={cn(
-        'relative flex rounded-card bg-paper p-3 transition hover:shadow-float',
+        'group relative flex rounded-card bg-paper p-3 transition-shadow hover:shadow-float',
         isRow ? 'items-center gap-3 md:flex-col md:items-stretch md:gap-0' : 'flex-col',
         dish.soldOut && 'opacity-60',
       )}
@@ -34,7 +38,7 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
           alt={dish.name}
           loading="lazy"
           className={cn(
-            'w-full object-cover',
+            'w-full object-cover transition duration-500 group-hover:-rotate-2 group-hover:scale-105',
             isRow
               ? 'aspect-square rounded-2xl md:aspect-[278/210] md:rounded-b-2xl md:rounded-t-full'
               : 'aspect-[278/210] rounded-b-2xl rounded-t-full',
@@ -89,8 +93,9 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
               {dish.kcal} kcal
             </span>
           </p>
-          <button
+          <motion.button
             type="button"
+            whileTap={PRESS}
             disabled={dish.soldOut}
             aria-label={`Add ${dish.name}`}
             onClick={() => openDish(dish.id)}
@@ -100,21 +105,22 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
             )}
           >
             {dish.soldOut ? 'Sold out' : 'Add +'}
-          </button>
+          </motion.button>
         </div>
       </div>
 
       {isRow && (
-        <button
+        <motion.button
           type="button"
+          whileTap={PRESS}
           disabled={dish.soldOut}
           aria-label={`Add ${dish.name}`}
           onClick={() => openDish(dish.id)}
           className="grid size-10 shrink-0 place-items-center rounded-full bg-jollof text-white disabled:bg-cocoa/20 md:hidden"
         >
           <Plus className="size-5" strokeWidth={3} />
-        </button>
+        </motion.button>
       )}
-    </article>
+    </motion.article>
   )
 }

@@ -6,9 +6,11 @@ import {
   Link,
   Outlet,
   useRouter,
+  useRouterState,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { motion } from 'motion/react'
 import { CompactFooter } from '@/components/layout/CompactFooter'
 import { Header } from '@/components/layout/Header'
 import { MobileMenu } from '@/components/layout/MobileMenu'
@@ -20,25 +22,34 @@ import { CheckoutDrawer } from '@/features/checkout/components/CheckoutDrawer'
 import { DishModal } from '@/features/menu/components/DishModal'
 import { siteInfoQuery } from '@/services/site/site.queries'
 
-const RootLayout = () => (
-  <>
-    <HeadContent />
-    <Header />
-    <main>
-      <Outlet />
-    </main>
-    <DishModal />
-    <CartDrawer />
-    <CheckoutDrawer />
-    <MobileMenu />
-    {import.meta.env.DEV && (
-      <>
-        <ReactQueryDevtools buttonPosition="bottom-left" />
-        <TanStackRouterDevtools position="bottom-right" />
-      </>
-    )}
-  </>
-)
+const RootLayout = () => {
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+
+  return (
+    <>
+      <HeadContent />
+      <Header />
+      <motion.main
+        key={pathname}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.35 }}
+      >
+        <Outlet />
+      </motion.main>
+      <DishModal />
+      <CartDrawer />
+      <CheckoutDrawer />
+      <MobileMenu />
+      {import.meta.env.DEV && (
+        <>
+          <ReactQueryDevtools buttonPosition="bottom-left" />
+          <TanStackRouterDevtools position="bottom-right" />
+        </>
+      )}
+    </>
+  )
+}
 
 const NotFound = () => (
   <>
@@ -79,7 +90,7 @@ const LoadError = ({ reset }: ErrorComponentProps) => {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: ({ context }) => context.queryClient.ensureQueryData(siteInfoQuery),
-  head: () => ({ meta: [{ title: 'Cook by Ugo · Lagos flavour, Newcastle doorstep' }] }),
+  head: () => ({ meta: [{ title: 'Cooked by Ugo · Lagos flavour, Newcastle doorstep' }] }),
   component: RootLayout,
   notFoundComponent: NotFound,
   errorComponent: LoadError,

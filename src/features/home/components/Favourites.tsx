@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
+import { Stagger } from '@/components/motion/Stagger'
 import { buttonStyles } from '@/components/ui/button.styles'
 import { Chip } from '@/components/ui/Chip'
 import { Container } from '@/components/ui/Container'
@@ -61,11 +62,14 @@ export const Favourites = () => {
         {isPending ? (
           <DishGridSkeleton />
         ) : (
-          <div className="grid gap-3 md:grid-cols-2 md:gap-5 lg:grid-cols-4">
+          <Stagger
+            key={category ?? 'favourites'}
+            className="grid gap-3 md:grid-cols-2 md:gap-5 lg:grid-cols-4"
+          >
             {cards.map(({ dish, ...card }) => (
               <DishCard key={dish.id} dish={dish} layout="row" {...card} />
             ))}
-          </div>
+          </Stagger>
         )}
 
         <Link

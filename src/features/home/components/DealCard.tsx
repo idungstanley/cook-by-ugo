@@ -1,5 +1,7 @@
+import { motion } from 'motion/react'
 import { Button } from '@/components/ui/Button'
 import { Tag } from '@/components/ui/Tag'
+import { CARD_HOVER, fadeUp } from '@/constants/motion'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
 import { useCartStore } from '@/stores/cart.store'
@@ -27,9 +29,11 @@ export const DealCard = ({ deal }: { deal: Deal }) => {
   }
 
   return (
-    <article
+    <motion.article
+      variants={fadeUp}
+      whileHover={CARD_HOVER}
       className={cn(
-        'relative flex min-h-[370px] flex-col overflow-hidden rounded-card p-6 text-white',
+        'group relative flex min-h-[370px] flex-col overflow-hidden rounded-card p-6 text-white',
         THEMES[deal.theme],
       )}
     >
@@ -37,7 +41,7 @@ export const DealCard = ({ deal }: { deal: Deal }) => {
         src={deal.image}
         alt=""
         loading="lazy"
-        className="absolute right-0 top-0 h-44 w-[46%] object-cover object-left"
+        className="absolute right-0 top-0 h-44 w-[46%] object-cover object-left transition duration-500 group-hover:scale-110"
       />
       <Tag className="relative self-start">{deal.tag}</Tag>
 
@@ -56,6 +60,6 @@ export const DealCard = ({ deal }: { deal: Deal }) => {
           </Button>
         </div>
       </div>
-    </article>
+    </motion.article>
   )
 }

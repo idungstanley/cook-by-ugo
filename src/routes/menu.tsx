@@ -108,6 +108,6 @@ export const Route = createFileRoute('/menu')({
       queryClient.ensureQueryData(favouritesQuery),
       queryClient.ensureQueryData(optionGroupsQuery),
     ]),
-  head: () => ({ meta: [{ title: 'Menu · Cook by Ugo' }] }),
+  head: () => ({ meta: [{ title: 'Menu · Cooked by Ugo' }] }),
   component: MenuPage,
 })
