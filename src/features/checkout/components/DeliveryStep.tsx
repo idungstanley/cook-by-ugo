@@ -19,6 +19,7 @@ import { splitPhone } from '../phone'
 import { PhoneField } from './PhoneField'
 
 const NOT_LISTED = 'not-listed'
+const UK_POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i
 
 const initialValues = (
   saved: DeliveryDetails | null,
@@ -58,6 +59,8 @@ export const DeliveryStep = () => {
     control,
     setValue,
     getValues,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<DeliveryFormInput, unknown, DeliveryFormValues>({
     resolver: zodResolver(deliverySchema),
@@ -79,6 +82,18 @@ export const DeliveryStep = () => {
       if (result.addresses.length > 0) setValue('address', '')
     },
   })
+
+  /** Only real-looking postcodes are sent, so an empty box never shows a confusing error. */
+  const findAddress = () => {
+    const postcode = getValues('postcode').trim()
+    lookup.reset()
+    if (!UK_POSTCODE.test(postcode)) {
+      setError('postcode', { message: 'Enter a full UK postcode, like NE1 4ST' })
+      return
+    }
+    clearErrors('postcode')
+    lookup.mutate(postcode)
+  }
 
   const chooseAddress = (choice: string) => {
     setAddressChoice(choice)
@@ -143,6 +158,7 @@ export const DeliveryStep = () => {
 
       <h3 className="mt-2 text-xl">Where should we bring it?</h3>
       <div>
+        {/* Errors sit under the whole row, so the button always lines up with the input. */}
         <div className="flex items-end gap-2">
           <div className="flex-1">
             <TextField
@@ -150,7 +166,7 @@ export const DeliveryStep = () => {
               placeholder="NE1 4ST"
               autoComplete="postal-code"
               className="uppercase"
-              error={errors.postcode?.message}
+              aria-invalid={errors.postcode || lookup.error ? true : undefined}
               {...register('postcode', {
                 onChange: () => {
                   // A changed postcode has to be checked again before the address can be used.
@@ -163,16 +179,16 @@ export const DeliveryStep = () => {
           </div>
           <Button
             variant="dark"
-            className="mb-[1px] h-12 shrink-0"
+            className="h-12 shrink-0"
             disabled={lookup.isPending}
-            onClick={() => lookup.mutate(getValues('postcode'))}
+            onClick={findAddress}
           >
             <MapPin className="size-4" /> {lookup.isPending ? 'Checking...' : 'Find address'}
           </Button>
         </div>
-        {lookup.error && (
+        {(errors.postcode?.message || lookup.error) && (
           <p role="alert" className="mt-1 text-xs font-semibold text-jollof">
-            {lookup.error.message}
+            {errors.postcode?.message ?? lookup.error?.message}
           </p>
         )}
         {check && !check.covered && (
