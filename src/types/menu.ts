@@ -16,6 +16,7 @@ export interface OptionChoice {
   id: string
   label: string
   priceDelta: Pence
+  image?: string
 }
 
 export type OptionGroupKind = 'radio' | 'chips' | 'segmented'
@@ -42,7 +43,8 @@ export interface Dish {
   /** Longer description for the dish pop-up, when it differs from the card. */
   longDescription?: string
   price: Pence
-  kcal: number
+  kcal?: number
+  /** Empty when the kitchen has not added a photo yet. */
   image: string
   badges: DishBadge[]
   allergens: string[]

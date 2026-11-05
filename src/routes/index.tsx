@@ -7,6 +7,7 @@ import { FindUs } from '@/features/home/components/FindUs'
 import { Hero } from '@/features/home/components/Hero'
 import { HowItWorks } from '@/features/home/components/HowItWorks'
 import { OurStory } from '@/features/home/components/OurStory'
+import { Reviews } from '@/features/home/components/Reviews'
 import { dealsQuery } from '@/services/deals/deals.queries'
 import {
   categoriesQuery,
@@ -23,6 +24,7 @@ const HomePage = () => (
     <OurStory />
     <Deals />
     <HowItWorks />
+    <Reviews />
     <FindUs />
     <Footer />
   </>

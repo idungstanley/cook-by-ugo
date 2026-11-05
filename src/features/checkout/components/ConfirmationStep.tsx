@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
 import { Starburst } from '@/components/brand/Starburst'
 import { Button } from '@/components/ui/Button'
@@ -43,7 +43,7 @@ export const ConfirmationStep = ({ order, onDone }: ConfirmationStepProps) => {
           <p className="font-display text-2xl font-extrabold">{order.number}</p>
         </div>
         <p className="text-right text-sm">
-          Arrives in
+          Arrives
           <br />
           {order.etaLabel}
         </p>
@@ -68,6 +68,15 @@ export const ConfirmationStep = ({ order, onDone }: ConfirmationStepProps) => {
         <Button variant="outline" size="lg" fullWidth onClick={backToMenu}>
           Back to menu
         </Button>
+        <Link
+          to="/track/$orderId"
+          params={{ orderId: order.id }}
+          search={{ key: order.trackingKey }}
+          onClick={onDone}
+          className="text-center text-sm font-semibold text-muted underline-offset-2 hover:text-cocoa hover:underline sm:col-span-2"
+        >
+          Open your tracking page
+        </Link>
       </div>
     </div>
   )

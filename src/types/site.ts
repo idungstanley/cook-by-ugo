@@ -22,8 +22,29 @@ export interface SiteInfo {
   ordersPaused: boolean
   todayHours: string
   freeDeliveryThreshold: number
-  cardEnabled: boolean
-  payOnDeliveryEnabled: boolean
+  /** Minutes from order to door for an order placed now. */
+  leadMinutes: number
+  stripePublishableKey: string | null
+  /** Whether checkout can list Royal Mail addresses for a postcode. */
+  addressLookup: boolean
+}
+
+export interface AddressOption {
+  id: string
+  line1: string
+  line2: string
+  city: string
+}
+
+export interface PostcodeCheck {
+  postcode: string
+  city: string
+  distanceMiles: number
+  covered: boolean
+  fee: number
+  minimumOrder: number
+  maxMiles: number
+  addresses: AddressOption[]
 }
 
 export interface DeliverySlot {

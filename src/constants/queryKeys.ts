@@ -6,6 +6,11 @@ export const queryKeys = {
   deals: ['deals'] as const,
   siteInfo: ['site-info'] as const,
   slots: ['slots'] as const,
-  quote: (items: unknown, postcode: string) => ['quote', items, postcode] as const,
+  quote: (items: unknown, postcode?: string) => ['quote', items, postcode] as const,
   order: (orderId: string) => ['orders', orderId] as const,
+  offers: ['offers'] as const,
+  reviews: ['reviews'] as const,
+  account: ['account'] as const,
+  accountOrders: ['account', 'orders'] as const,
+  postcode: (postcode: string) => ['postcode', postcode] as const,
 }

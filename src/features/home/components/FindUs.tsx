@@ -10,7 +10,7 @@ export const FindUs = () => {
   const { data: site } = useSiteInfo()
 
   return (
-    <section id="find-us" className="py-16 md:py-24">
+    <section id="find-us" className="overflow-x-clip py-16 md:py-24">
       <Container className="grid items-center gap-10 lg:grid-cols-[1fr_1.45fr] lg:gap-20">
         <div>
           <SectionHeading eyebrow="Find us" title="Come say hello" accent="in Newcastle." />

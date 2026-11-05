@@ -45,7 +45,7 @@ export const CartDrawer = () => {
           <div className="mt-auto flex flex-col gap-5 px-5 pb-6 pt-4 sm:px-8">
             <CartUpsell />
             <FreeDeliveryBar totals={totals} />
-            <CartTotalsSummary totals={totals} />
+            <CartTotalsSummary totals={totals} appliedOffers={totals.appliedOffers} />
             <div className="flex flex-col items-center gap-2">
               <Button size="lg" fullWidth onClick={startCheckout}>
                 Checkout · {formatPrice(totals.total)} →

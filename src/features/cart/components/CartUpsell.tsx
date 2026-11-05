@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/Button'
+import { FoodImage } from '@/components/ui/FoodImage'
 import { UPSELL_DISH_ID } from '@/constants/checkout'
 import { formatPrice } from '@/lib/format'
 import { useDishes } from '@/services/menu/menu.queries'
@@ -14,7 +15,7 @@ export const CartUpsell = () => {
 
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-gold-soft p-3">
-      <img src={dish.image} alt="" className="size-14 shrink-0 rounded-full object-cover" />
+      <FoodImage src={dish.image} alt="" className="size-14 shrink-0 rounded-full" />
       <div className="min-w-0 flex-1">
         <p className="font-display font-bold leading-tight">Add Fried Plantain?</p>
         <p className="text-xs text-muted">

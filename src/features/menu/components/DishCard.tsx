@@ -1,9 +1,11 @@
 import { Plus } from 'lucide-react'
 import { motion } from 'motion/react'
+import { FoodImage } from '@/components/ui/FoodImage'
 import { Tag } from '@/components/ui/Tag'
 import { CARD_HOVER, fadeUp, HOVER_GROW, PRESS } from '@/constants/motion'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
+import { useDishOffer } from '@/services/offers/offers.queries'
 import { useUiStore } from '@/stores/ui.store'
 import type { Dish } from '@/types'
 
@@ -20,6 +22,7 @@ interface DishCardProps {
 
 export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCardProps) => {
   const openDish = useUiStore((state) => state.openDish)
+  const offer = useDishOffer(dish.id)
   const isRow = layout === 'row'
 
   return (
@@ -33,12 +36,12 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
       )}
     >
       <div className={cn('relative shrink-0', isRow ? 'w-[88px] md:w-full' : 'w-full')}>
-        <img
+        <FoodImage
           src={dish.image}
           alt={dish.name}
           loading="lazy"
           className={cn(
-            'w-full object-cover transition duration-500 group-hover:-rotate-2 group-hover:scale-105',
+            'w-full transition duration-500 group-hover:-rotate-2 group-hover:scale-105',
             isRow
               ? 'aspect-square rounded-2xl md:aspect-[278/210] md:rounded-b-2xl md:rounded-t-full'
               : 'aspect-[278/210] rounded-b-2xl rounded-t-full',
@@ -47,6 +50,7 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
         <div
           className={cn('absolute left-2 top-2 flex flex-wrap gap-1', isRow && 'hidden md:flex')}
         >
+          {offer && <Tag tone="jollof">{offer.label}</Tag>}
           {tag ? (
             <Tag>{tag}</Tag>
           ) : (
@@ -66,6 +70,7 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
         )}
       >
         <h3 className="text-lg font-bold leading-tight md:text-xl">{dish.name}</h3>
+        {offer && isRow && <p className="text-xs font-bold text-jollof md:hidden">{offer.label}</p>}
         <p
           className={cn(
             'mt-1 text-[13px] leading-snug text-muted md:mb-4 md:text-sm',
@@ -89,9 +94,11 @@ export const DishCard = ({ dish, tag, description, layout = 'stacked' }: DishCar
             <span className="font-display text-xl font-extrabold md:text-2xl">
               {formatPrice(dish.price)}
             </span>
-            <span className={cn('text-xs text-muted', isRow && 'hidden md:inline')}>
-              {dish.kcal} kcal
-            </span>
+            {Boolean(dish.kcal) && (
+              <span className={cn('text-xs text-muted', isRow && 'hidden md:inline')}>
+                {dish.kcal} kcal
+              </span>
+            )}
           </p>
           <motion.button
             type="button"

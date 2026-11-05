@@ -1,5 +1,6 @@
 import { Stagger } from '@/components/motion/Stagger'
 import { Container } from '@/components/ui/Container'
+import { OffersStrip } from '@/features/offers/OffersStrip'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useDeals } from '@/services/deals/deals.queries'
@@ -12,6 +13,7 @@ export const Deals = () => {
     <section id="deals" className="py-16 md:py-24">
       <Container>
         <SectionHeading eyebrow="Save more, chop more" title="Deals worth" accent="sharing." />
+        <OffersStrip className="mt-6" />
         <Stagger gap={0.12} className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {isPending
             ? Array.from({ length: 3 }, (_, index) => (

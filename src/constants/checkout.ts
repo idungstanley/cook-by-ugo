@@ -4,7 +4,6 @@ import type { OrderStatus } from '@/types'
 export const FREE_DELIVERY_THRESHOLD = 2500
 export const DELIVERY_FEE = 299
 export const DEFAULT_CITY = 'Newcastle upon Tyne'
-export const ASAP_LABEL = '35 to 45 min'
 
 export const UPSELL_DISH_ID = 'fried-plantain'
 

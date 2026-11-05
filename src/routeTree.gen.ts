@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MenuRouteImport } from './routes/menu'
+import { Route as AccountIndexRouteImport } from './routes/account.index'
+import { Route as AccountResetPasswordRouteImport } from './routes/account.reset-password'
 import { Route as InfoSlugRouteImport } from './routes/info.$slug'
+import { Route as TrackOrderIdRouteImport } from './routes/track.$orderId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,40 +26,86 @@ const MenuRoute = MenuRouteImport.update({
   path: '/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountResetPasswordRoute = AccountResetPasswordRouteImport.update({
+  id: '/account/reset-password',
+  path: '/account/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InfoSlugRoute = InfoSlugRouteImport.update({
   id: '/info/$slug',
   path: '/info/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackOrderIdRoute = TrackOrderIdRouteImport.update({
+  id: '/track/$orderId',
+  path: '/track/$orderId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/menu': typeof MenuRoute
+  '/account/reset-password': typeof AccountResetPasswordRoute
   '/info/$slug': typeof InfoSlugRoute
+  '/track/$orderId': typeof TrackOrderIdRoute
+  '/account/': typeof AccountIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/menu': typeof MenuRoute
+  '/account/reset-password': typeof AccountResetPasswordRoute
   '/info/$slug': typeof InfoSlugRoute
+  '/track/$orderId': typeof TrackOrderIdRoute
+  '/account': typeof AccountIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/menu': typeof MenuRoute
+  '/account/reset-password': typeof AccountResetPasswordRoute
   '/info/$slug': typeof InfoSlugRoute
+  '/track/$orderId': typeof TrackOrderIdRoute
+  '/account/': typeof AccountIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/menu' | '/info/$slug'
+  fullPaths:
+    | '/'
+    | '/menu'
+    | '/account/reset-password'
+    | '/info/$slug'
+    | '/track/$orderId'
+    | '/account/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/menu' | '/info/$slug'
-  id: '__root__' | '/' | '/menu' | '/info/$slug'
+  to:
+    | '/'
+    | '/menu'
+    | '/account/reset-password'
+    | '/info/$slug'
+    | '/track/$orderId'
+    | '/account'
+  id:
+    | '__root__'
+    | '/'
+    | '/menu'
+    | '/account/reset-password'
+    | '/info/$slug'
+    | '/track/$orderId'
+    | '/account/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MenuRoute: typeof MenuRoute
+  AccountResetPasswordRoute: typeof AccountResetPasswordRoute
   InfoSlugRoute: typeof InfoSlugRoute
+  TrackOrderIdRoute: typeof TrackOrderIdRoute
+  AccountIndexRoute: typeof AccountIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +124,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/reset-password': {
+      id: '/account/reset-password'
+      path: '/account/reset-password'
+      fullPath: '/account/reset-password'
+      preLoaderRoute: typeof AccountResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/info/$slug': {
       id: '/info/$slug'
       path: '/info/$slug'
       fullPath: '/info/$slug'
       preLoaderRoute: typeof InfoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track/$orderId': {
+      id: '/track/$orderId'
+      path: '/track/$orderId'
+      fullPath: '/track/$orderId'
+      preLoaderRoute: typeof TrackOrderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -88,7 +158,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MenuRoute: MenuRoute,
+  AccountResetPasswordRoute: AccountResetPasswordRoute,
   InfoSlugRoute: InfoSlugRoute,
+  TrackOrderIdRoute: TrackOrderIdRoute,
+  AccountIndexRoute: AccountIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

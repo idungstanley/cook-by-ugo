@@ -1,4 +1,4 @@
-import type { OptionGroup, Pence } from '@/types'
+import type { CartItemOption, OptionGroup, Pence } from '@/types'
 
 /** Selected choice ids, keyed by option group id. */
 export type DishSelection = Record<string, string[]>
@@ -46,3 +46,29 @@ export const getSelectionKey = (selection: DishSelection) =>
     .map(([groupId, choices]) => `${groupId}=${[...choices].sort().join('+')}`)
     .sort()
     .join('|')
+
+/** Each chosen option with its own price, for the separate lines in the basket. */
+export const getSelectedOptions = (
+  groups: OptionGroup[],
+  selection: DishSelection,
+): CartItemOption[] =>
+  groups.flatMap((group) =>
+    selectedChoices(group, selection).map(({ label, priceDelta }) => ({
+      groupTitle: group.title,
+      label,
+      price: priceDelta,
+    })),
+  )
+
+/** The group to look at after answering `group`: the next one still unanswered, if any. */
+export const getNextGroup = (
+  groups: OptionGroup[],
+  group: OptionGroup,
+  selection: DishSelection,
+) => {
+  const after = groups.slice(groups.indexOf(group) + 1)
+  return (
+    after.find(({ id, required }) => required && !selection[id]?.length) ??
+    after.find(({ id }) => !selection[id]?.length)
+  )
+}

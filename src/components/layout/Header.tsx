@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Menu, ShoppingBag } from 'lucide-react'
+import { Menu, ShoppingBag, UserRound } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Logo } from '@/components/brand/Logo'
 import { buttonStyles } from '@/components/ui/button.styles'
@@ -9,6 +9,7 @@ import { IconButton } from '@/components/ui/IconButton'
 import { SPRING } from '@/constants/motion'
 import { HEADER_NAV } from '@/constants/navigation'
 import { useCartTotals } from '@/hooks/useCartTotals'
+import { useAccount } from '@/services/account/account.queries'
 import { useSiteInfo } from '@/services/site/site.queries'
 import { useUiStore } from '@/stores/ui.store'
 import { navLinkProps } from './navLinkProps'
@@ -16,6 +17,7 @@ import { navLinkProps } from './navLinkProps'
 export const Header = () => {
   const { itemCount } = useCartTotals()
   const { data: site } = useSiteInfo()
+  const { data: account } = useAccount()
   const openPanel = useUiStore((state) => state.openPanel)
   const setMobileMenuOpen = useUiStore((state) => state.setMobileMenuOpen)
 
@@ -42,6 +44,15 @@ export const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <Link
+            to="/account"
+            className={buttonStyles({
+              variant: 'ghost',
+              className: 'no-underline hover:no-underline',
+            })}
+          >
+            <UserRound className="size-4" /> {account ? account.name.split(' ')[0] : 'Sign in'}
+          </Link>
           <Button variant="outline" onClick={() => openPanel('cart')}>
             Cart · {itemCount}
           </Button>
@@ -51,6 +62,13 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
+          <Link
+            to="/account"
+            aria-label={account ? 'Your account' : 'Sign in'}
+            className="grid size-11 place-items-center rounded-full border border-line bg-paper transition hover:scale-105"
+          >
+            <UserRound className="size-5" />
+          </Link>
           <IconButton
             label={`Open cart, ${itemCount} items`}
             className="relative border border-line bg-paper"

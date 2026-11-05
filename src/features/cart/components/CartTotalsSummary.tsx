@@ -1,5 +1,5 @@
 import { formatPrice } from '@/lib/format'
-import type { CartTotals } from '@/types'
+import type { AppliedOffer, CartTotals } from '@/types'
 
 export const FreeDeliveryBar = ({ totals }: { totals: CartTotals }) => {
   const unlocked = totals.amountToFreeDelivery === 0
@@ -21,12 +21,23 @@ export const FreeDeliveryBar = ({ totals }: { totals: CartTotals }) => {
   )
 }
 
-export const CartTotalsSummary = ({ totals }: { totals: CartTotals }) => (
+interface CartTotalsSummaryProps {
+  totals: CartTotals
+  appliedOffers?: AppliedOffer[]
+}
+
+export const CartTotalsSummary = ({ totals, appliedOffers = [] }: CartTotalsSummaryProps) => (
   <dl className="flex flex-col gap-2 text-sm">
     <div className="flex justify-between">
       <dt className="text-muted">Subtotal</dt>
       <dd>{formatPrice(totals.subtotal)}</dd>
     </div>
+    {totals.discount > 0 && (
+      <div className="flex justify-between font-semibold text-ewedu">
+        <dt>{appliedOffers.find(({ discount }) => discount > 0)?.name ?? 'Offer'}</dt>
+        <dd>−{formatPrice(totals.discount)}</dd>
+      </div>
+    )}
     <div className="flex justify-between border-b border-line pb-3">
       <dt className="text-muted">Delivery (estimate)</dt>
       <dd className={totals.deliveryFee === 0 ? 'font-semibold text-ewedu' : ''}>

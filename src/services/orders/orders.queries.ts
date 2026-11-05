@@ -8,14 +8,18 @@ const FINISHED_STATUSES: OrderStatus[] = ['delivered', 'cancelled']
 
 export const useCreateOrder = () => useMutation({ mutationFn: ordersApi.createOrder })
 
-/** The server's price for this basket and postcode, which is what the customer pays. */
-export const useOrderQuote = (items: OrderLineInput[], postcode: string) =>
+/**
+ * The server's price for this basket, which is what the customer pays. Without a postcode it
+ * still includes any offer, just not delivery.
+ */
+export const useOrderQuote = (items: OrderLineInput[], postcode?: string) =>
   useQuery({
     queryKey: queryKeys.quote(items, postcode),
-    queryFn: () => ordersApi.getQuote({ items, postcode }),
+    queryFn: () => ordersApi.getQuote({ items, postcode: postcode || undefined }),
     enabled: items.length > 0,
     retry: false,
     staleTime: 0,
+    placeholderData: (previous) => previous,
   })
 
 export const useOrder = (orderId: string, trackingKey: string) =>

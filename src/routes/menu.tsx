@@ -5,6 +5,7 @@ import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { ErrorMessage, StatusMessage } from '@/components/ui/StatusMessage'
 import { DishGridSkeleton } from '@/features/menu/components/DishGridSkeleton'
+import { OffersStrip } from '@/features/offers/OffersStrip'
 import { MenuFilters } from '@/features/menu/components/MenuFilters'
 import { MenuSectionList } from '@/features/menu/components/MenuSectionList'
 import { MobileBasketBar } from '@/features/menu/components/MobileBasketBar'
@@ -63,6 +64,8 @@ const MenuPage = () => {
             sides, done.
           </p>
         </div>
+
+        <OffersStrip className="mt-6" />
 
         <div className="sticky top-[76px] z-10 -mx-5 mt-6 bg-shea/95 px-5 py-2 backdrop-blur md:top-[88px] md:mx-0 md:mt-10 md:bg-transparent md:px-0 md:backdrop-blur-none">
           <MenuFilters

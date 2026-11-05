@@ -22,6 +22,7 @@ export const useCartStore = create<CartState>()(
         set((state) => ({ items: state.items.filter(({ id }) => id !== itemId) })),
       clear: () => set({ items: [] }),
     }),
-    { name: 'cook-by-ugo-cart-v2' },
+    // The key changes whenever a basket line's shape does, so old baskets never break the page.
+    { name: 'cook-by-ugo-cart-v3' },
   ),
 )

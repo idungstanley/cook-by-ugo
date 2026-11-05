@@ -8,7 +8,7 @@ import type {
 } from '@/types'
 
 export const ordersApi = {
-  getQuote: (input: { items: OrderLineInput[]; postcode: string }) =>
+  getQuote: (input: { items: OrderLineInput[]; postcode?: string }) =>
     http.post<OrderQuote>('/quote', input),
   createOrder: (input: CreateOrderInput) => http.post<PlacedOrder>('/orders', input),
   getOrder: (orderId: string, trackingKey: string) =>

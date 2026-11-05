@@ -1,165 +1,247 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { Appearance } from '@stripe/stripe-js'
+import { Lock } from 'lucide-react'
+import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/Button'
-import { RadioCard } from '@/components/ui/RadioCard'
-import { ASAP_LABEL } from '@/constants/checkout'
-import { summariseItems } from '@/features/cart/cart.utils'
+import { useCartLines } from '@/hooks/useCartTotals'
 import { formatPrice } from '@/lib/format'
+import { getStripe } from '@/lib/stripe'
 import { useCreateOrder, useOrderQuote } from '@/services/orders/orders.queries'
 import { useDeliverySlots, useSiteInfo } from '@/services/site/site.queries'
 import { useCartStore } from '@/stores/cart.store'
 import { useCheckoutStore } from '@/stores/checkout.store'
-import type { PaymentMethod } from '@/types'
-import { cardSchema, type CardFormInput } from '../checkout.schema'
-import { CardFields } from './CardFields'
+import type { OrderQuote, PlacedOrder } from '@/types'
+import { arrivalLabel } from '../arrival'
 
-export const PaymentStep = () => {
-  const [method, setMethod] = useState<PaymentMethod>('card')
+/** Stripe's form in the site's colours and fonts. */
+const APPEARANCE: Appearance = {
+  theme: 'stripe',
+  variables: {
+    colorPrimary: '#C8401C',
+    colorText: '#1C0F0A',
+    colorBackground: '#F6EDE0',
+    colorDanger: '#A83315',
+    fontFamily: 'Manrope Variable, system-ui, sans-serif',
+    borderRadius: '16px',
+  },
+}
+
+const PAID_STATUSES = ['succeeded', 'processing', 'requires_capture']
+
+const Row = ({ label, value, accent }: { label: string; value: string; accent?: boolean }) => (
+  <div
+    className={accent ? 'flex justify-between font-semibold text-ewedu' : 'flex justify-between'}
+  >
+    <dt className={accent ? undefined : 'text-muted'}>{label}</dt>
+    <dd>{value}</dd>
+  </div>
+)
+
+const OrderSummary = ({ quote, eta }: { quote?: OrderQuote; eta: string }) => {
   const items = useCartStore((state) => state.items)
+  const offerName = quote?.appliedOffers.find(({ discount }) => discount > 0)?.name
+
+  return (
+    <section className="rounded-2xl bg-shea px-4 py-3 text-sm">
+      <ul className="flex flex-col gap-1.5 border-b border-line pb-3">
+        {items.map((item) => (
+          <li key={item.id}>
+            <div className="flex justify-between gap-3 font-semibold">
+              <span>
+                {item.quantity} × {item.name}
+              </span>
+              <span>{formatPrice(item.unitPrice * item.quantity)}</span>
+            </div>
+            {item.options.length > 0 && (
+              <p className="text-xs text-muted">
+                {item.options.map(({ label }) => label).join(' · ')}
+              </p>
+            )}
+            {item.note && <p className="text-xs italic text-muted">“{item.note}”</p>}
+          </li>
+        ))}
+      </ul>
+      {quote && (
+        <dl className="flex flex-col gap-1 pt-3">
+          <Row label="Subtotal" value={formatPrice(quote.subtotal)} />
+          {quote.discount > 0 && (
+            <Row accent label={offerName ?? 'Offer'} value={`−${formatPrice(quote.discount)}`} />
+          )}
+          <Row
+            label="Delivery"
+            value={quote.deliveryFee === 0 ? 'Free' : formatPrice(quote.deliveryFee)}
+          />
+          <div className="flex justify-between pt-1 font-display text-lg font-extrabold">
+            <dt>Total</dt>
+            <dd>{formatPrice(quote.total)}</dd>
+          </div>
+        </dl>
+      )}
+      <p className="mt-2 text-xs text-muted">Arrives {eta}</p>
+    </section>
+  )
+}
+
+interface PayFormProps {
+  placed: PlacedOrder
+  onPaid: () => void
+}
+
+const PayForm = ({ placed, onPaid }: PayFormProps) => {
+  const stripe = useStripe()
+  const elements = useElements()
+  const [error, setError] = useState<string | null>(null)
+  const [paying, setPaying] = useState(false)
+
+  const pay = async (event: FormEvent) => {
+    event.preventDefault()
+    if (!stripe || !elements) return
+    setPaying(true)
+    setError(null)
+    // Some banks send the customer away to approve; they come back to their tracking page.
+    const returnUrl = `${window.location.origin}/track/${placed.order.id}?key=${encodeURIComponent(placed.trackingKey)}`
+    const result = await stripe.confirmPayment({
+      elements,
+      confirmParams: { return_url: returnUrl },
+      redirect: 'if_required',
+    })
+    setPaying(false)
+
+    if (result.error) {
+      setError(result.error.message ?? 'Your payment did not go through. Please try again.')
+      return
+    }
+    if (PAID_STATUSES.includes(result.paymentIntent.status)) onPaid()
+    else setError('Your payment was not completed. Please try again.')
+  }
+
+  return (
+    <form onSubmit={(event) => void pay(event)} className="flex flex-1 flex-col gap-4">
+      <PaymentElement options={{ layout: 'tabs' }} />
+      {error && (
+        <p role="alert" className="text-sm font-semibold text-jollof">
+          {error}
+        </p>
+      )}
+      <div className="mt-auto pt-2 text-center">
+        <Button type="submit" size="lg" fullWidth disabled={!stripe || paying}>
+          {paying ? 'Paying...' : `Pay ${formatPrice(placed.order.total)}`}
+        </Button>
+        <p className="mt-2 inline-flex items-center gap-1 text-xs text-muted">
+          <Lock className="size-3" /> Secure payment by Stripe. We never see your card details.
+        </p>
+      </div>
+    </form>
+  )
+}
+
+/** Every order is paid for at checkout. The order is created first, then Stripe takes payment. */
+export const PaymentStep = () => {
   const clearCart = useCartStore((state) => state.clear)
   const delivery = useCheckoutStore((state) => state.delivery)
   const setStep = useCheckoutStore((state) => state.setStep)
   const completeOrder = useCheckoutStore((state) => state.completeOrder)
   const createOrder = useCreateOrder()
-  const [idempotencyKey] = useState(() => crypto.randomUUID())
-  const [unfinishedPayment, setUnfinishedPayment] = useState(false)
-  const lines = useMemo(
-    () => items.map(({ productId, quantity, selection }) => ({ productId, quantity, selection })),
-    [items],
-  )
-  const quote = useOrderQuote(lines, delivery?.postcode ?? '')
+  // A failed attempt gets a fresh key, so trying again places a new order instead of the old one.
+  const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID())
+  const [placed, setPlaced] = useState<PlacedOrder | null>(null)
+  const lines = useCartLines()
+  const quote = useOrderQuote(lines, delivery?.postcode)
   const { data: site } = useSiteInfo()
   const { data: slots } = useDeliverySlots()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CardFormInput>({ resolver: zodResolver(cardSchema) })
 
   if (!delivery) return null
 
   const { postcode, timing, ...details } = delivery
-  const totals = quote.data
   const slotLabel = slots?.find(({ at }) => at === delivery.scheduledFor)?.label
-  const eta = timing === 'scheduled' && slotLabel ? slotLabel : `ASAP, ${ASAP_LABEL}`
+  const eta =
+    timing === 'scheduled' && slotLabel
+      ? slotLabel.replace('Today, ', 'today at ')
+      : `in about ${site?.leadMinutes ?? 45} minutes`
 
-  const placeOrder = () =>
+  const finish = (order: PlacedOrder) => {
+    completeOrder({
+      id: order.order.id,
+      number: order.order.number,
+      status: 'received',
+      trackingKey: order.trackingKey,
+      etaLabel: arrivalLabel(order.order),
+    })
+    clearCart()
+  }
+
+  const startPayment = () =>
     createOrder.mutate(
       {
         idempotencyKey,
         items: lines,
         postcode,
-        paymentMethod: method,
         delivery: {
           ...details,
           scheduledFor: timing === 'scheduled' ? details.scheduledFor : undefined,
         },
       },
       {
-        onSuccess: ({ order, trackingKey }) => {
-          // A pending order needs Stripe's payment form, so it must not look like a success.
-          if (order.status === 'pending-payment') {
-            setUnfinishedPayment(true)
-            return
-          }
-          completeOrder({
-            ...order,
-            trackingKey,
-            etaLabel: timing === 'scheduled' && slotLabel ? slotLabel : `${order.etaMinutes} min`,
-          })
-          clearCart()
+        onSuccess: (order) => {
+          // Without Stripe, in local development, the order is already confirmed.
+          if (!order.clientSecret) finish(order)
+          else setPlaced(order)
         },
+        onError: () => setIdempotencyKey(crypto.randomUUID()),
       },
     )
 
-  const formattedTotal = totals ? formatPrice(totals.total) : ''
+  const publishableKey = site?.stripePublishableKey
   const errorMessage =
     quote.error?.message ??
     createOrder.error?.message ??
-    (unfinishedPayment ? 'Card payment is not available yet. Please pay on delivery.' : null)
+    (placed && !publishableKey ? 'Card payments are not set up yet. Please try again later.' : null)
 
   return (
-    <form
-      noValidate
-      onSubmit={
-        method === 'card'
-          ? handleSubmit(placeOrder)
-          : (event) => {
-              event.preventDefault()
-              placeOrder()
-            }
-      }
-      className="flex flex-1 flex-col gap-4 px-5 pb-6 sm:px-8"
-    >
-      <div className="flex items-center justify-between gap-3 rounded-2xl bg-shea px-4 py-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">{summariseItems(items)}</p>
-          <p className="text-xs text-muted">
-            {totals &&
-              `Delivery ${totals.deliveryFee === 0 ? 'free' : formatPrice(totals.deliveryFee)} · `}
-            {eta}
-          </p>
-        </div>
-        <p className="font-display text-xl font-extrabold">{formattedTotal}</p>
-      </div>
+    <div className="flex flex-1 flex-col gap-4 px-5 pb-6 sm:px-8">
+      <OrderSummary quote={quote.data} eta={eta} />
 
-      <h3 className="text-xl">How would you like to pay?</h3>
-      <div className="grid grid-cols-2 gap-3">
-        <RadioCard
-          name="payment-method"
-          title="Card"
-          description="Visa, Mastercard, Apple Pay"
-          disabled={site?.cardEnabled === false}
-          selected={method === 'card'}
-          onSelect={() => setMethod('card')}
-        />
-        <RadioCard
-          name="payment-method"
-          title="Pay on delivery"
-          description="Cash or card at the door"
-          disabled={site?.payOnDeliveryEnabled === false}
-          selected={method === 'on-delivery'}
-          onSelect={() => setMethod('on-delivery')}
-        />
-      </div>
-
-      {method === 'card' ? (
-        <CardFields register={register} errors={errors} />
-      ) : (
-        <div className="rounded-2xl bg-gold-soft p-4">
-          <p className="font-display text-xl font-extrabold">Have {formattedTotal} ready</p>
-          <p className="mt-1 text-sm text-muted">
-            Pay in cash or by card when your food arrives. Our rider carries a card machine.
-          </p>
-        </div>
-      )}
-
-      {errorMessage && (
-        <p role="alert" className="text-sm font-semibold text-jollof">
-          {errorMessage}
-        </p>
-      )}
-
-      <div className="mt-auto pt-2 text-center">
-        <Button type="submit" size="lg" fullWidth disabled={createOrder.isPending || !totals}>
-          {createOrder.isPending
-            ? 'Placing your order...'
-            : method === 'card'
-              ? `Pay ${formattedTotal}`
-              : `Place order · ${formattedTotal}`}
-        </Button>
-        <p className="mt-2 text-xs text-muted">
-          {method === 'card' && 'Secure payment · '}
-          <button
-            type="button"
-            className="underline-offset-2 hover:underline"
-            onClick={() => setStep('delivery')}
+      {placed?.clientSecret && publishableKey ? (
+        <>
+          <h3 className="text-xl">Pay by card</h3>
+          <Elements
+            stripe={getStripe(publishableKey)}
+            options={{ clientSecret: placed.clientSecret, appearance: APPEARANCE }}
           >
-            Back to delivery
-          </button>
-        </p>
-      </div>
-    </form>
+            <PayForm placed={placed} onPaid={() => finish(placed)} />
+          </Elements>
+        </>
+      ) : (
+        <>
+          {errorMessage && (
+            <p role="alert" className="text-sm font-semibold text-jollof">
+              {errorMessage}
+            </p>
+          )}
+          <div className="mt-auto pt-2 text-center">
+            <Button
+              size="lg"
+              fullWidth
+              disabled={createOrder.isPending || !quote.data || Boolean(placed)}
+              onClick={startPayment}
+            >
+              {createOrder.isPending
+                ? 'Getting payment ready...'
+                : `Continue to pay ${quote.data ? formatPrice(quote.data.total) : ''}`}
+            </Button>
+            <p className="mt-2 text-xs text-muted">
+              Card, Apple Pay or Google Pay ·{' '}
+              <button
+                type="button"
+                className="underline-offset-2 hover:underline"
+                onClick={() => setStep('delivery')}
+              >
+                Back to delivery
+              </button>
+            </p>
+          </div>
+        </>
+      )}
+    </div>
   )
 }
