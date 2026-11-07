@@ -11,6 +11,7 @@ import { Stars } from '@/features/reviews/StarRating'
 import { formatPrice } from '@/lib/format'
 import { useOrder } from '@/services/orders/orders.queries'
 import { useCartStore } from '@/stores/cart.store'
+import { ChangesPanel } from './ChangesPanel'
 import { OrderLines } from './OrderLines'
 
 interface TrackOrderPageProps {
@@ -57,6 +58,10 @@ export const TrackOrderPage = ({ orderId, trackingKey, paymentReturned }: TrackO
             </p>
           )}
         </div>
+
+        {order.status === 'awaiting-customer' && (
+          <ChangesPanel order={order} trackingKey={trackingKey} />
+        )}
 
         {order.status === 'pending-payment' ? (
           <p role="status" className="rounded-2xl bg-gold-soft p-4 text-sm font-semibold">

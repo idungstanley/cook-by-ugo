@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ORDER_STATUS_POLL_MS } from '@/constants/checkout'
 import { queryKeys } from '@/constants/queryKeys'
 import type { OrderLineInput, OrderStatus } from '@/types'
@@ -32,3 +32,14 @@ export const useOrder = (orderId: string, trackingKey: string) =>
         ? false
         : ORDER_STATUS_POLL_MS,
   })
+
+export const useRespondToChanges = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ordersApi.respondToChanges,
+    onSuccess: (_result, { orderId }) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.order(orderId) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.accountOrders })
+    },
+  })
+}

@@ -19,7 +19,28 @@ export interface DeliveryDetails {
 }
 
 export type OrderStatus =
-  'pending-payment' | 'received' | 'preparing' | 'out-for-delivery' | 'delivered' | 'cancelled'
+  | 'pending-payment'
+  | 'received'
+  | 'awaiting-customer'
+  | 'preparing'
+  | 'out-for-delivery'
+  | 'delivered'
+  | 'cancelled'
+
+/** The kitchen ran out of something, and the customer chooses what happens. */
+export interface OrderAmendment {
+  state: 'waiting' | 'awaiting-payment' | 'resolved'
+  unavailableItemIds: string[]
+  message?: string
+  resolution?: 'removed' | 'replaced' | 'cancelled'
+  /** A started payment for replacements that cost more. */
+  topUp: { extra: Pence; clientSecret?: string } | null
+  /** Exactly what removing the items gives back, with offers re-checked. */
+  removalRefund: Pence | null
+}
+
+export type ChangeResponse =
+  { action: 'remove' } | { action: 'cancel' } | { action: 'replace'; items: OrderLineInput[] }
 
 export type OrderLineInput = Pick<CartItem, 'productId' | 'quantity' | 'selection' | 'note'>
 
@@ -74,6 +95,7 @@ export interface PlacedOrder {
 export interface TrackedOrder extends OrderSummary {
   paymentStatus: string
   review: { rating: number; comment?: string; reply?: string } | null
+  amendment: OrderAmendment | null
 }
 
 /** What the confirmation screen needs after checkout. */

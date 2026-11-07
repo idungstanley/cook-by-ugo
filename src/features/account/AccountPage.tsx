@@ -25,6 +25,7 @@ import { AuthPanel } from './AuthPanel'
 const STATUS_LABELS: Record<OrderStatus, string> = {
   'pending-payment': 'Awaiting payment',
   received: 'Received',
+  'awaiting-customer': 'Action needed',
   preparing: 'Being prepared',
   'out-for-delivery': 'On its way',
   delivered: 'Delivered',
@@ -126,7 +127,13 @@ const OrderRow = ({ order }: { order: AccountOrder }) => (
       <p className="font-display text-lg font-extrabold">{order.number}</p>
       <Tag
         tone={
-          order.status === 'delivered' ? 'ewedu' : order.status === 'cancelled' ? 'paper' : 'gold'
+          order.status === 'awaiting-customer'
+            ? 'jollof'
+            : order.status === 'delivered'
+              ? 'ewedu'
+              : order.status === 'cancelled'
+                ? 'paper'
+                : 'gold'
         }
       >
         {STATUS_LABELS[order.status]}
@@ -139,6 +146,17 @@ const OrderRow = ({ order }: { order: AccountOrder }) => (
     <div className="flex flex-wrap items-center justify-between gap-2">
       <p className="font-semibold">{formatPrice(order.total)}</p>
       <div className="flex gap-2">
+        {order.status === 'awaiting-customer' && (
+          <Link
+            to="/track/$orderId"
+            params={{ orderId: order.id }}
+            search={{ key: order.trackingKey }}
+            hash="update"
+            className={buttonStyles({ size: 'sm' })}
+          >
+            Update order
+          </Link>
+        )}
         {order.status === 'delivered' && !order.reviewed && (
           <Link
             to="/track/$orderId"

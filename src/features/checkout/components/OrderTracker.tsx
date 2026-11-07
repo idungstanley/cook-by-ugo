@@ -4,7 +4,9 @@ import { cn } from '@/lib/cn'
 import type { OrderStatus } from '@/types'
 
 export const OrderTracker = ({ status }: { status: OrderStatus }) => {
-  const currentIndex = ORDER_STAGES.findIndex((stage) => stage.status === status)
+  // While the customer decides about out-of-stock items, the order is still at the first step.
+  const shownStatus = status === 'awaiting-customer' ? 'received' : status
+  const currentIndex = ORDER_STAGES.findIndex((stage) => stage.status === shownStatus)
 
   if (status === 'cancelled') {
     return (

@@ -1,32 +1,14 @@
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import type { Appearance } from '@stripe/stripe-js'
-import { Lock } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useCartLines } from '@/hooks/useCartTotals'
 import { formatPrice } from '@/lib/format'
-import { getStripe } from '@/lib/stripe'
 import { useCreateOrder, useOrderQuote } from '@/services/orders/orders.queries'
 import { useDeliverySlots, useSiteInfo } from '@/services/site/site.queries'
 import { useCartStore } from '@/stores/cart.store'
 import { useCheckoutStore } from '@/stores/checkout.store'
 import type { OrderQuote, PlacedOrder } from '@/types'
 import { arrivalLabel } from '../arrival'
-
-/** Stripe's form in the site's colours and fonts. */
-const APPEARANCE: Appearance = {
-  theme: 'stripe',
-  variables: {
-    colorPrimary: '#C8401C',
-    colorText: '#1C0F0A',
-    colorBackground: '#F6EDE0',
-    colorDanger: '#A83315',
-    fontFamily: 'Manrope Variable, system-ui, sans-serif',
-    borderRadius: '16px',
-  },
-}
-
-const PAID_STATUSES = ['succeeded', 'processing', 'requires_capture']
+import { StripePayment } from './StripePayment'
 
 const Row = ({ label, value, accent }: { label: string; value: string; accent?: boolean }) => (
   <div
@@ -79,59 +61,6 @@ const OrderSummary = ({ quote, eta }: { quote?: OrderQuote; eta: string }) => {
       )}
       <p className="mt-2 text-xs text-muted">Arrives {eta}</p>
     </section>
-  )
-}
-
-interface PayFormProps {
-  placed: PlacedOrder
-  onPaid: () => void
-}
-
-const PayForm = ({ placed, onPaid }: PayFormProps) => {
-  const stripe = useStripe()
-  const elements = useElements()
-  const [error, setError] = useState<string | null>(null)
-  const [paying, setPaying] = useState(false)
-
-  const pay = async (event: FormEvent) => {
-    event.preventDefault()
-    if (!stripe || !elements) return
-    setPaying(true)
-    setError(null)
-    // Some banks send the customer away to approve; they come back to their tracking page.
-    const returnUrl = `${window.location.origin}/track/${placed.order.id}?key=${encodeURIComponent(placed.trackingKey)}`
-    const result = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: returnUrl },
-      redirect: 'if_required',
-    })
-    setPaying(false)
-
-    if (result.error) {
-      setError(result.error.message ?? 'Your payment did not go through. Please try again.')
-      return
-    }
-    if (PAID_STATUSES.includes(result.paymentIntent.status)) onPaid()
-    else setError('Your payment was not completed. Please try again.')
-  }
-
-  return (
-    <form onSubmit={(event) => void pay(event)} className="flex flex-1 flex-col gap-4">
-      <PaymentElement options={{ layout: 'tabs' }} />
-      {error && (
-        <p role="alert" className="text-sm font-semibold text-jollof">
-          {error}
-        </p>
-      )}
-      <div className="mt-auto pt-2 text-center">
-        <Button type="submit" size="lg" fullWidth disabled={!stripe || paying}>
-          {paying ? 'Paying...' : `Pay ${formatPrice(placed.order.total)}`}
-        </Button>
-        <p className="mt-2 inline-flex items-center gap-1 text-xs text-muted">
-          <Lock className="size-3" /> Secure payment by Stripe. We never see your card details.
-        </p>
-      </div>
-    </form>
   )
 }
 
@@ -204,12 +133,14 @@ export const PaymentStep = () => {
       {placed?.clientSecret && publishableKey ? (
         <>
           <h3 className="text-xl">Pay by card</h3>
-          <Elements
-            stripe={getStripe(publishableKey)}
-            options={{ clientSecret: placed.clientSecret, appearance: APPEARANCE }}
-          >
-            <PayForm placed={placed} onPaid={() => finish(placed)} />
-          </Elements>
+          <StripePayment
+            publishableKey={publishableKey}
+            clientSecret={placed.clientSecret}
+            amount={placed.order.total}
+            // Some banks send the customer away to approve; they come back to their tracking page.
+            returnUrl={`${window.location.origin}/track/${placed.order.id}?key=${encodeURIComponent(placed.trackingKey)}`}
+            onPaid={() => finish(placed)}
+          />
         </>
       ) : (
         <>

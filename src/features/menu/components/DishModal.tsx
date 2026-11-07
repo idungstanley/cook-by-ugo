@@ -12,6 +12,7 @@ import { formatPrice } from '@/lib/format'
 import { useDishes, useFavourites, useOptionGroups } from '@/services/menu/menu.queries'
 import { useDishOffer } from '@/services/offers/offers.queries'
 import { useCartStore } from '@/stores/cart.store'
+import { useReplacementStore } from '@/stores/replacement.store'
 import { useUiStore } from '@/stores/ui.store'
 import type { Category, Dish, OptionGroup } from '@/types'
 import { OptionGroupField } from './OptionGroupField'
@@ -33,7 +34,10 @@ interface DishFormProps {
 const HIGHLIGHT_MS = 1600
 
 const DishForm = ({ dish, groups, isMostOrdered, onClose }: DishFormProps) => {
-  const addItem = useCartStore((state) => state.addItem)
+  const addToCart = useCartStore((state) => state.addItem)
+  const replacing = useReplacementStore((state) => Boolean(state.orderId))
+  const addReplacement = useReplacementStore((state) => state.addItem)
+  const addItem = replacing ? addReplacement : addToCart
   const offer = useDishOffer(dish.id)
   const groupRefs = useRef(new Map<string, HTMLFieldSetElement>())
   const [highlighted, setHighlighted] = useState<string | null>(null)
@@ -176,7 +180,7 @@ const DishForm = ({ dish, groups, isMostOrdered, onClose }: DishFormProps) => {
           >
             {missingGroup
               ? `Choose ${missingGroup.title.replace(/^choose (your |a )?/i, '').toLowerCase()} →`
-              : `Add to order · ${formatPrice(totalPrice)}`}
+              : `${replacing ? 'Add as replacement' : 'Add to order'} · ${formatPrice(totalPrice)}`}
           </Button>
         </div>
       </div>
