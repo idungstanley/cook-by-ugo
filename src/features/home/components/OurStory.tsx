@@ -1,8 +1,6 @@
-import { Link } from '@tanstack/react-router'
 import { motion } from 'motion/react'
 import { Reveal } from '@/components/motion/Reveal'
 import { Stagger } from '@/components/motion/Stagger'
-import { buttonStyles } from '@/components/ui/button.styles'
 import { Container } from '@/components/ui/Container'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { STORY_STATS } from '@/constants/content'
@@ -53,16 +51,6 @@ export const OurStory = () => {
               </motion.dl>
             ))}
           </Stagger>
-
-          <Reveal delay={0.4}>
-            <Link
-              to="/info/$slug"
-              params={{ slug: 'our-story' }}
-              className={buttonStyles({ variant: 'light', className: 'mt-8' })}
-            >
-              Read our story →
-            </Link>
-          </Reveal>
         </div>
       </Container>
     </section>

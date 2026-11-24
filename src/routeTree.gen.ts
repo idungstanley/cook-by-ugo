@@ -10,10 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AllergensRouteImport } from './routes/allergens'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as MenuRouteImport } from './routes/menu'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as AccountResetPasswordRouteImport } from './routes/account.reset-password'
-import { Route as InfoSlugRouteImport } from './routes/info.$slug'
 import { Route as TrackOrderIdRouteImport } from './routes/track.$orderId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -21,9 +23,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AllergensRoute = AllergensRouteImport.update({
+  id: '/allergens',
+  path: '/allergens',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MenuRoute = MenuRouteImport.update({
   id: '/menu',
   path: '/menu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountIndexRoute = AccountIndexRouteImport.update({
@@ -36,11 +53,6 @@ const AccountResetPasswordRoute = AccountResetPasswordRouteImport.update({
   path: '/account/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InfoSlugRoute = InfoSlugRouteImport.update({
-  id: '/info/$slug',
-  path: '/info/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TrackOrderIdRoute = TrackOrderIdRouteImport.update({
   id: '/track/$orderId',
   path: '/track/$orderId',
@@ -49,26 +61,32 @@ const TrackOrderIdRoute = TrackOrderIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/allergens': typeof AllergensRoute
+  '/contact': typeof ContactRoute
   '/menu': typeof MenuRoute
+  '/privacy': typeof PrivacyRoute
   '/account/reset-password': typeof AccountResetPasswordRoute
-  '/info/$slug': typeof InfoSlugRoute
   '/track/$orderId': typeof TrackOrderIdRoute
   '/account/': typeof AccountIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/allergens': typeof AllergensRoute
+  '/contact': typeof ContactRoute
   '/menu': typeof MenuRoute
+  '/privacy': typeof PrivacyRoute
   '/account/reset-password': typeof AccountResetPasswordRoute
-  '/info/$slug': typeof InfoSlugRoute
   '/track/$orderId': typeof TrackOrderIdRoute
   '/account': typeof AccountIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/allergens': typeof AllergensRoute
+  '/contact': typeof ContactRoute
   '/menu': typeof MenuRoute
+  '/privacy': typeof PrivacyRoute
   '/account/reset-password': typeof AccountResetPasswordRoute
-  '/info/$slug': typeof InfoSlugRoute
   '/track/$orderId': typeof TrackOrderIdRoute
   '/account/': typeof AccountIndexRoute
 }
@@ -76,34 +94,42 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/allergens'
+    | '/contact'
     | '/menu'
+    | '/privacy'
     | '/account/reset-password'
-    | '/info/$slug'
     | '/track/$orderId'
     | '/account/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/allergens'
+    | '/contact'
     | '/menu'
+    | '/privacy'
     | '/account/reset-password'
-    | '/info/$slug'
     | '/track/$orderId'
     | '/account'
   id:
     | '__root__'
     | '/'
+    | '/allergens'
+    | '/contact'
     | '/menu'
+    | '/privacy'
     | '/account/reset-password'
-    | '/info/$slug'
     | '/track/$orderId'
     | '/account/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AllergensRoute: typeof AllergensRoute
+  ContactRoute: typeof ContactRoute
   MenuRoute: typeof MenuRoute
+  PrivacyRoute: typeof PrivacyRoute
   AccountResetPasswordRoute: typeof AccountResetPasswordRoute
-  InfoSlugRoute: typeof InfoSlugRoute
   TrackOrderIdRoute: typeof TrackOrderIdRoute
   AccountIndexRoute: typeof AccountIndexRoute
 }
@@ -117,11 +143,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/allergens': {
+      id: '/allergens'
+      path: '/allergens'
+      fullPath: '/allergens'
+      preLoaderRoute: typeof AllergensRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/menu': {
       id: '/menu'
       path: '/menu'
       fullPath: '/menu'
       preLoaderRoute: typeof MenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/': {
@@ -138,13 +185,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/info/$slug': {
-      id: '/info/$slug'
-      path: '/info/$slug'
-      fullPath: '/info/$slug'
-      preLoaderRoute: typeof InfoSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/track/$orderId': {
       id: '/track/$orderId'
       path: '/track/$orderId'
@@ -157,9 +197,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AllergensRoute: AllergensRoute,
+  ContactRoute: ContactRoute,
   MenuRoute: MenuRoute,
+  PrivacyRoute: PrivacyRoute,
   AccountResetPasswordRoute: AccountResetPasswordRoute,
-  InfoSlugRoute: InfoSlugRoute,
   TrackOrderIdRoute: TrackOrderIdRoute,
   AccountIndexRoute: AccountIndexRoute,
 }

@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import { FoodHygieneBadge } from '@/components/brand/FoodHygieneBadge'
 import { Stagger } from '@/components/motion/Stagger'
 import { Container } from '@/components/ui/Container'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -8,32 +9,41 @@ import { useReviews } from '@/services/reviews/reviews.queries'
 
 const dateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' })
 
-/** Real reviews from delivered orders. Hidden until there are some to show. */
+/** Trust in one place: the council's hygiene rating, then what customers say. */
 export const Reviews = () => {
   const { data } = useReviews()
-  if (!data || data.summary.count === 0) return null
-  const { summary, reviews } = data
+  const summary = data?.summary
+  const reviews = data?.reviews ?? []
 
   return (
-    <section className="py-16 md:py-24">
+    <section id="reviews" className="py-16 md:py-24">
       <Container>
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <SectionHeading eyebrow="Reviews" title="Newcastle has" accent="spoken." />
-          <div className="flex items-center gap-4">
-            <p className="font-display text-6xl font-extrabold leading-none">
-              {summary.average.toFixed(1)}
-            </p>
-            <div>
-              <Stars rating={summary.average} />
-              <p className="text-sm text-muted">
-                from {summary.count} {summary.count === 1 ? 'review' : 'reviews'}
-              </p>
-            </div>
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <SectionHeading
+            eyebrow="Reviews"
+            title="Rated 5 for hygiene,"
+            accent="loved by Newcastle."
+          />
+          <div className="flex flex-wrap items-center gap-6">
+            <FoodHygieneBadge className="w-44 md:w-52" />
+            {summary && summary.count > 0 && (
+              <div className="flex items-center gap-3">
+                <p className="font-display text-6xl font-extrabold leading-none">
+                  {summary.average.toFixed(1)}
+                </p>
+                <div>
+                  <Stars rating={summary.average} />
+                  <p className="text-sm text-muted">
+                    from {summary.count} {summary.count === 1 ? 'review' : 'reviews'}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {reviews.length > 0 && (
-          <Stagger className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Stagger className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {reviews.slice(0, 6).map((review) => (
               <motion.figure
                 key={review.id}
@@ -51,7 +61,8 @@ export const Reviews = () => {
                 <figcaption className="mt-auto text-sm font-semibold">
                   {review.displayName}{' '}
                   <span className="font-normal text-muted">
-                    · {dateFormat.format(review.createdAt)}
+                    · {review.source ? `on ${review.source}, ` : ''}
+                    {dateFormat.format(review.createdAt)}
                   </span>
                 </figcaption>
               </motion.figure>

@@ -1,4 +1,4 @@
-import { Drawer, CloseButton } from '@/components/ui/Overlay'
+import { CloseButton, Modal } from '@/components/ui/Overlay'
 import { PanelHeader } from '@/features/cart/components/PanelHeader'
 import { useCheckoutStore } from '@/stores/checkout.store'
 import { useUiStore } from '@/stores/ui.store'
@@ -20,23 +20,31 @@ export const CheckoutDrawer = () => {
   }
 
   return (
-    <Drawer open={open} onClose={close} label="Checkout">
-      {step === 'done' && order ? (
-        <>
-          <div className="flex justify-end px-5 pt-5 sm:px-8 sm:pt-8">
-            <CloseButton onClick={close} />
-          </div>
-          <ConfirmationStep order={order} onDone={close} />
-        </>
-      ) : (
-        <>
-          <PanelHeader title="Checkout" onClose={close} />
-          <div className="px-5 pb-4 pt-3 sm:px-8">
-            <CheckoutProgress current={step} />
-          </div>
-          {step === 'delivery' ? <DeliveryStep /> : <PaymentStep />}
-        </>
-      )}
-    </Drawer>
+    // Centred and roomy on larger screens, like Uber Eats, and full screen on phones.
+    <Modal
+      open={open}
+      onClose={close}
+      label="Checkout"
+      className="h-[94dvh] md:h-[min(880px,92dvh)] md:max-w-[720px]"
+    >
+      <div className="flex h-full flex-col overflow-y-auto">
+        {step === 'done' && order ? (
+          <>
+            <div className="flex justify-end px-5 pt-5 sm:px-8 sm:pt-8">
+              <CloseButton onClick={close} />
+            </div>
+            <ConfirmationStep order={order} onDone={close} />
+          </>
+        ) : (
+          <>
+            <PanelHeader title="Checkout" onClose={close} />
+            <div className="px-5 pb-4 pt-3 sm:px-8">
+              <CheckoutProgress current={step} />
+            </div>
+            {step === 'delivery' ? <DeliveryStep /> : <PaymentStep />}
+          </>
+        )}
+      </div>
+    </Modal>
   )
 }

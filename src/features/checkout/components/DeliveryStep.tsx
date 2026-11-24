@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { CircleCheck, MapPin } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Button } from '@/components/ui/Button'
 import { SelectField, TextAreaField, TextField } from '@/components/ui/fields'
@@ -79,9 +79,17 @@ export const DeliveryStep = () => {
       setValue('postcode', result.postcode)
       setValue('city', result.city, { shouldValidate: true })
       setValue('postcodeConfirmed', result.covered, { shouldValidate: true })
-      if (result.addresses.length > 0) setValue('address', '')
     },
   })
+
+  // A saved address is checked straight away, and kept in the street box so it can be changed.
+  const savedPostcode = savedDelivery ? undefined : account?.address?.postcode
+  useEffect(() => {
+    if (!savedPostcode) return
+    lookup.mutate(savedPostcode, { onSuccess: () => setAddressChoice(NOT_LISTED) })
+    // Runs once, for the address the form started with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedPostcode])
 
   /** Only real-looking postcodes are sent, so an empty box never shows a confusing error. */
   const findAddress = () => {
@@ -92,7 +100,12 @@ export const DeliveryStep = () => {
       return
     }
     clearErrors('postcode')
-    lookup.mutate(postcode)
+    lookup.mutate(postcode, {
+      onSuccess: (result) => {
+        // A fresh lookup asks the customer to pick from the Royal Mail list when there is one.
+        if (result.addresses.length > 0) setValue('address', '')
+      },
+    })
   }
 
   const chooseAddress = (choice: string) => {

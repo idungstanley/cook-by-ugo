@@ -11,7 +11,7 @@ export const FOOTER_NAV = [
     links: [
       { label: 'Menu', to: '/menu' },
       { label: 'Deals', to: '/', hash: 'deals' },
-      { label: 'Catering', to: '/info/$slug', slug: 'catering' },
+      { label: 'Your account', to: '/account' },
     ],
   },
   {
@@ -19,24 +19,14 @@ export const FOOTER_NAV = [
     links: [
       { label: 'Our story', to: '/', hash: 'our-story' },
       { label: 'Find us', to: '/', hash: 'find-us' },
-      { label: 'Contact', to: '/info/$slug', slug: 'contact' },
+      { label: 'Contact', to: '/contact' },
     ],
   },
   {
     title: 'Help',
     links: [
-      { label: 'Delivery areas', to: '/info/$slug', slug: 'delivery-areas' },
-      { label: 'Allergens', to: '/info/$slug', slug: 'allergens' },
-      { label: 'Privacy', to: '/info/$slug', slug: 'privacy' },
+      { label: 'Allergens', to: '/allergens' },
+      { label: 'Privacy', to: '/privacy' },
     ],
   },
 ] as const
-
-export const INFO_PAGES: Record<string, string> = {
-  'our-story': 'Our story',
-  catering: 'Catering',
-  contact: 'Contact',
-  'delivery-areas': 'Delivery areas',
-  allergens: 'Allergens',
-  privacy: 'Privacy',
-}

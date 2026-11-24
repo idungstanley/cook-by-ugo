@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
 import { Star } from 'lucide-react'
+import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { CompactFooter } from '@/components/layout/CompactFooter'
@@ -13,6 +14,7 @@ import { Tag } from '@/components/ui/Tag'
 import { PhoneField } from '@/features/checkout/components/PhoneField'
 import { formatPhone, splitPhone } from '@/features/checkout/phone'
 import { formatPrice } from '@/lib/format'
+import { siteApi } from '@/services/site/site.api'
 import {
   useAccount,
   useAccountOrders,
@@ -59,12 +61,14 @@ type ProfileValues = z.infer<typeof profileSchema>
 
 const ProfileForm = ({ account }: { account: Account }) => {
   const update = useUpdateProfile()
+  const [postcodeError, setPostcodeError] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
     control,
     formState: { errors, isDirty },
     reset,
+    setValue,
   } = useForm<ProfileValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -77,22 +81,35 @@ const ProfileForm = ({ account }: { account: Account }) => {
   })
   const phoneCountry = useWatch({ control, name: 'phoneCountry' })
 
-  const save = ({
+  /** A changed postcode is looked up, so the city always matches it. */
+  const save = async ({
     name,
     phoneCountry: country,
     phoneNumber,
     line1,
-    city,
     postcode,
-  }: ProfileValues) =>
+  }: ProfileValues) => {
+    setPostcodeError(null)
+    let address: { line1: string; city: string; postcode: string } | undefined
+    if (line1 && postcode) {
+      try {
+        const place = await siteApi.checkPostcode(postcode)
+        address = { line1, city: place.city, postcode: place.postcode }
+        setValue('city', place.city)
+      } catch (error) {
+        setPostcodeError(error instanceof Error ? error.message : 'We could not find that postcode')
+        return
+      }
+    }
     update.mutate(
       {
         name,
         phone: phoneNumber ? (formatPhone(country, phoneNumber) ?? undefined) : undefined,
-        address: line1 && city && postcode ? { line1, city, postcode } : undefined,
+        address,
       },
       { onSuccess: () => reset(undefined, { keepValues: true }) },
     )
+  }
 
   return (
     <form
@@ -111,8 +128,18 @@ const ProfileForm = ({ account }: { account: Account }) => {
       />
       <TextField label="House number and street" {...register('line1')} />
       <div className="grid grid-cols-[1.6fr_1fr] gap-3">
-        <TextField label="City" {...register('city')} />
-        <TextField label="Postcode" className="uppercase" {...register('postcode')} />
+        <TextField
+          label="City"
+          readOnly
+          className="cursor-not-allowed text-muted"
+          {...register('city')}
+        />
+        <TextField
+          label="Postcode"
+          className="uppercase"
+          error={postcodeError ?? undefined}
+          {...register('postcode')}
+        />
       </div>
       <Button type="submit" disabled={!isDirty || update.isPending} className="self-start">
         {update.isSuccess && !isDirty ? 'Saved' : 'Save details'}

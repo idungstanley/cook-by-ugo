@@ -10,7 +10,7 @@ import { DishGridSkeleton } from '@/features/menu/components/DishGridSkeleton'
 import { useCategories, useDishes, useFavourites } from '@/services/menu/menu.queries'
 import type { CategoryId } from '@/types'
 
-const CARDS_SHOWN = 4
+const CARDS_SHOWN = 6
 
 export const Favourites = () => {
   const [category, setCategory] = useState<CategoryId>()
@@ -64,10 +64,10 @@ export const Favourites = () => {
         ) : (
           <Stagger
             key={category ?? 'favourites'}
-            className="grid gap-3 md:grid-cols-2 md:gap-5 lg:grid-cols-4"
+            className="grid gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-3"
           >
             {cards.map(({ dish, ...card }) => (
-              <DishCard key={dish.id} dish={dish} layout="row" {...card} />
+              <DishCard key={dish.id} dish={dish} {...card} />
             ))}
           </Stagger>
         )}

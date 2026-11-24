@@ -94,14 +94,15 @@ const DishForm = ({ dish, groups, isMostOrdered, onClose }: DishFormProps) => {
   }
 
   return (
-    <div className="relative grid max-h-[94dvh] grid-rows-[auto_1fr] overflow-y-auto md:max-h-[min(760px,92dvh)] md:grid-cols-[42%_1fr] md:grid-rows-1 md:overflow-hidden">
+    <div className="relative grid max-h-[94dvh] grid-rows-[auto_1fr] overflow-y-auto md:max-h-[min(780px,92dvh)] md:grid-cols-[1fr_1fr] md:grid-rows-1 md:overflow-hidden">
       <CloseButton onClick={onClose} className="absolute right-4 top-4 z-10" />
 
       <div className="relative p-3 md:p-3 md:pr-0">
         <FoodImage
           src={dish.image}
           alt={dish.name}
-          className="h-44 w-full rounded-3xl md:h-full md:rounded-b-3xl md:rounded-t-full"
+          // A plain square-cornered photo, as on Uber Eats, so the whole plate shows.
+          className="aspect-[4/3] w-full rounded-3xl md:aspect-auto md:h-full"
         />
         {offer && (
           <Tag tone="jollof" className="absolute left-6 top-6">

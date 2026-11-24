@@ -21,10 +21,10 @@ const HomePage = () => (
     <Hero />
     <DishTicker />
     <Favourites />
+    <Reviews />
     <OurStory />
     <Deals />
     <HowItWorks />
-    <Reviews />
     <FindUs />
     <Footer />
   </>

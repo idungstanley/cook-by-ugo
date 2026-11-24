@@ -5,6 +5,8 @@ export interface Review {
   comment?: string
   likedItems: string[]
   reply?: string
+  /** Where it was left, such as "Uber Eats". Missing for reviews left on this website. */
+  source?: string
   createdAt: number
 }
 

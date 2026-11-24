@@ -1,10 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/fields'
+import { PhoneField } from '@/features/checkout/components/PhoneField'
+import { DEFAULT_COUNTRY, formatPhone } from '@/features/checkout/phone'
 import { cn } from '@/lib/cn'
+import { siteApi } from '@/services/site/site.api'
 import { useForgotPassword, useSignIn, useSignUp } from '@/services/account/account.queries'
 
 type Mode = 'sign-in' | 'sign-up' | 'forgot'
@@ -14,12 +17,25 @@ const signInSchema = z.object({
   password: z.string().min(1, 'Enter your password'),
 })
 
-const signUpSchema = z.object({
-  name: z.string().trim().min(2, 'Enter your name'),
-  email: z.email('Enter a valid email'),
-  password: z.string().min(8, 'Use at least 8 characters'),
-  marketingOptIn: z.boolean(),
-})
+const UK_POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i
+
+const signUpSchema = z
+  .object({
+    name: z.string().trim().min(2, 'Enter your name'),
+    email: z.email('Enter a valid email'),
+    password: z.string().min(8, 'Use at least 8 characters'),
+    phoneCountry: z.string(),
+    phoneNumber: z.string().trim().min(1, 'Enter your phone number'),
+    line1: z.string().trim().min(2, 'Enter your house number and street'),
+    postcode: z.string().trim().regex(UK_POSTCODE, 'Enter a full UK postcode, like NE1 4ST'),
+    marketingOptIn: z.boolean(),
+  })
+  .refine(({ phoneCountry, phoneNumber }) => formatPhone(phoneCountry, phoneNumber) !== null, {
+    path: ['phoneNumber'],
+    message: 'Enter a valid phone number for that country',
+  })
+
+type SignUpValues = z.infer<typeof signUpSchema>
 
 const SignInForm = ({ onForgot }: { onForgot: () => void }) => {
   const signIn = useSignIn()
@@ -70,18 +86,41 @@ const SignInForm = ({ onForgot }: { onForgot: () => void }) => {
 
 const SignUpForm = () => {
   const signUp = useSignUp()
+  const [postcodeError, setPostcodeError] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm({ resolver: zodResolver(signUpSchema), defaultValues: { marketingOptIn: false } })
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpValues>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: { marketingOptIn: false, phoneCountry: DEFAULT_COUNTRY },
+  })
+  const phoneCountry = useWatch({ control, name: 'phoneCountry' })
+
+  /** The postcode is looked up, so the saved address has the right city and format. */
+  const submit = async ({
+    phoneCountry: country,
+    phoneNumber,
+    line1,
+    postcode,
+    ...values
+  }: SignUpValues) => {
+    setPostcodeError(null)
+    try {
+      const place = await siteApi.checkPostcode(postcode)
+      signUp.mutate({
+        ...values,
+        phone: formatPhone(country, phoneNumber) ?? phoneNumber,
+        address: { line1, city: place.city, postcode: place.postcode },
+      })
+    } catch (error) {
+      setPostcodeError(error instanceof Error ? error.message : 'We could not find that postcode')
+    }
+  }
 
   return (
-    <form
-      noValidate
-      onSubmit={handleSubmit((values) => signUp.mutate(values))}
-      className="flex flex-col gap-4"
-    >
+    <form noValidate onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
       <TextField
         label="Full name"
         autoComplete="name"
@@ -102,6 +141,27 @@ const SignUpForm = () => {
         error={errors.password?.message}
         {...register('password')}
       />
+      <PhoneField
+        country={phoneCountry}
+        error={errors.phoneNumber?.message}
+        countryProps={register('phoneCountry')}
+        numberProps={{ placeholder: '07400 123456', ...register('phoneNumber') }}
+      />
+      <TextField
+        label="House number and street"
+        autoComplete="street-address"
+        placeholder="12 Grey Street, Flat 3"
+        error={errors.line1?.message}
+        {...register('line1')}
+      />
+      <TextField
+        label="Postcode"
+        autoComplete="postal-code"
+        placeholder="NE1 4ST"
+        className="uppercase"
+        error={errors.postcode?.message ?? postcodeError ?? undefined}
+        {...register('postcode')}
+      />
       <label className="flex items-start gap-2.5 text-sm">
         <input type="checkbox" className="mt-0.5 size-4" {...register('marketingOptIn')} />
         Send me offers by email. You can unsubscribe at any time.
@@ -111,8 +171,8 @@ const SignUpForm = () => {
           {signUp.error.message}
         </p>
       )}
-      <Button type="submit" size="lg" disabled={signUp.isPending}>
-        {signUp.isPending ? 'Creating your account...' : 'Create account'}
+      <Button type="submit" size="lg" disabled={signUp.isPending || isSubmitting}>
+        {signUp.isPending || isSubmitting ? 'Creating your account...' : 'Create account'}
       </Button>
     </form>
   )

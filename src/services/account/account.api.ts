@@ -5,6 +5,8 @@ export interface SignUpInput {
   name: string
   email: string
   password: string
+  phone: string
+  address: SavedAddress
   marketingOptIn: boolean
 }
 

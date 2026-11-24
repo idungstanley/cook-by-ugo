@@ -28,9 +28,9 @@ export const MenuSectionList = ({ sections }: { sections: MenuSection[] }) => (
             {pluralise(dishes.length, 'dish', 'dishes')}
           </span>
         </Reveal>
-        <Stagger gap={0.06} className="grid gap-3 md:grid-cols-2 md:gap-5 lg:grid-cols-4">
+        <Stagger gap={0.06} className="grid gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-3">
           {dishes.map((dish) => (
-            <DishCard key={dish.id} dish={dish} layout="row" />
+            <DishCard key={dish.id} dish={dish} />
           ))}
         </Stagger>
       </section>
