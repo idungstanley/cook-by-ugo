@@ -1,5 +1,60 @@
 import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from '@/constants/checkout'
-import type { CartItem, CartTotals, NewCartItem } from '@/types'
+import { getSelectedOptions, getUnitPrice } from '@/features/menu/dishSelection'
+import type { CartItem, CartTotals, Deal, Dish, NewCartItem, OptionGroup } from '@/types'
+
+/**
+ * Brings saved basket lines up to date with the current menu, so a price the kitchen changed
+ * shows in the basket straight away. Lines that match nothing on the menu are left alone, and
+ * the same array comes back when nothing changed, so it is safe to call on every menu load.
+ */
+export const refreshCartItems = (
+  items: CartItem[],
+  dishes: Dish[],
+  groups: OptionGroup[],
+  deals: Deal[],
+): CartItem[] => {
+  const latest = (item: CartItem): CartItem | null => {
+    const dish = dishes.find(({ id }) => id === item.productId)
+    if (dish) {
+      const dishGroups = groups.filter(({ id }) => dish.optionGroupIds.includes(id))
+      return {
+        ...item,
+        name: dish.name,
+        image: dish.image,
+        basePrice: dish.price,
+        options: getSelectedOptions(dishGroups, item.selection),
+        unitPrice: getUnitPrice(dish.price, dishGroups, item.selection),
+      }
+    }
+    const deal = deals.find(({ id }) => id === item.productId)
+    if (deal) {
+      return {
+        ...item,
+        name: deal.name,
+        image: deal.image,
+        basePrice: deal.price,
+        unitPrice: deal.price,
+      }
+    }
+    return null
+  }
+
+  let changed = false
+  const next = items.map((item) => {
+    const fresh = latest(item)
+    if (!fresh) return item
+    const same =
+      fresh.name === item.name &&
+      fresh.image === item.image &&
+      fresh.basePrice === item.basePrice &&
+      fresh.unitPrice === item.unitPrice &&
+      JSON.stringify(fresh.options) === JSON.stringify(item.options)
+    if (same) return item
+    changed = true
+    return fresh
+  })
+  return changed ? next : items
+}
 
 export const addCartItem = (items: CartItem[], newItem: NewCartItem): CartItem[] => {
   const {

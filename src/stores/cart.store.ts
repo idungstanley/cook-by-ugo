@@ -9,6 +9,8 @@ interface CartState {
   setQuantity: (itemId: string, quantity: number) => void
   removeItem: (itemId: string) => void
   clear: () => void
+  /** Replaces the lines, used to bring saved prices up to date with the menu. */
+  replaceItems: (items: CartItem[]) => void
 }
 
 export const useCartStore = create<CartState>()(
@@ -21,6 +23,7 @@ export const useCartStore = create<CartState>()(
       removeItem: (itemId) =>
         set((state) => ({ items: state.items.filter(({ id }) => id !== itemId) })),
       clear: () => set({ items: [] }),
+      replaceItems: (items) => set({ items }),
     }),
     // The key changes whenever a basket line's shape does, so old baskets never break the page.
     { name: 'cook-by-ugo-cart-v3' },

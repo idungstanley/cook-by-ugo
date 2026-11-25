@@ -20,10 +20,12 @@ import { StatusMessage } from '@/components/ui/StatusMessage'
 import { CartDrawer } from '@/features/cart/components/CartDrawer'
 import { CheckoutDrawer } from '@/features/checkout/components/CheckoutDrawer'
 import { DishModal } from '@/features/menu/components/DishModal'
+import { useFreshCartPrices } from '@/hooks/useFreshCartPrices'
 import { siteInfoQuery } from '@/services/site/site.queries'
 
 const RootLayout = () => {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
+  useFreshCartPrices()
 
   return (
     <>
