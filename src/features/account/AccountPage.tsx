@@ -18,9 +18,11 @@ import { siteApi } from '@/services/site/site.api'
 import {
   useAccount,
   useAccountOrders,
+  useResendVerification,
   useSignOut,
   useUpdateProfile,
 } from '@/services/account/account.queries'
+import { useRecentOrdersStore } from '@/stores/recentOrders.store'
 import type { Account, AccountOrder, OrderStatus } from '@/types'
 import { AuthPanel } from './AuthPanel'
 
@@ -208,6 +210,61 @@ const OrderRow = ({ order }: { order: AccountOrder }) => (
   </li>
 )
 
+/** Until the email is confirmed, guest orders with it stay hidden, so nobody sees someone else's. */
+const ConfirmEmailBanner = ({ email }: { email: string }) => {
+  const resend = useResendVerification()
+  return (
+    <div role="status" className="rounded-2xl bg-gold-soft p-4 text-sm">
+      <p className="font-semibold">Confirm your email to see all your orders</p>
+      <p className="mt-1">
+        We sent a link to {email}. Once you tap it, orders you placed with this email before signing
+        up will show here too.
+      </p>
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-3"
+        disabled={resend.isPending || resend.isSuccess}
+        onClick={() => resend.mutate()}
+      >
+        {resend.isSuccess ? 'Sent. Check your inbox' : 'Send the link again'}
+      </Button>
+    </div>
+  )
+}
+
+/** Orders placed on this device, for guests who closed or refreshed the page. */
+const DeviceOrders = () => {
+  const orders = useRecentOrdersStore((state) => state.orders)
+  if (orders.length === 0) return null
+  return (
+    <section className="mx-auto mt-8 max-w-md rounded-card bg-paper p-5 shadow-sm">
+      <h2 className="text-xl">Orders on this device</h2>
+      <ul className="mt-2">
+        {orders.map((order) => (
+          <li
+            key={order.id}
+            className="flex items-center justify-between gap-3 border-b border-line py-3 last:border-b-0"
+          >
+            <div>
+              <p className="font-display font-extrabold">{order.number}</p>
+              <p className="text-xs text-muted">{dateFormat.format(order.placedAt)}</p>
+            </div>
+            <Link
+              to="/track/$orderId"
+              params={{ orderId: order.id }}
+              search={{ key: order.trackingKey }}
+              className={buttonStyles({ variant: 'outline', size: 'sm' })}
+            >
+              Track
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 const SignedIn = ({ account }: { account: Account }) => {
   const signOut = useSignOut()
   const { data: orders, isPending } = useAccountOrders(true)
@@ -220,6 +277,7 @@ const SignedIn = ({ account }: { account: Account }) => {
           <h1 className="text-4xl">Hi {account.name.split(' ')[0]}</h1>
           <p className="text-sm text-muted">{account.email}</p>
         </div>
+        {!account.emailVerifiedAt && <ConfirmEmailBanner email={account.email} />}
         <ProfileForm account={account} />
         <Button variant="ghost" className="self-start" onClick={() => signOut.mutate()}>
           Sign out
@@ -238,7 +296,11 @@ const SignedIn = ({ account }: { account: Account }) => {
         ) : (
           <StatusMessage
             title="No orders yet"
-            body="Orders you place while signed in will show here."
+            body={
+              account.emailVerifiedAt
+                ? 'Orders placed with your email will show here.'
+                : 'Orders you place while signed in will show here.'
+            }
             action={
               <Link to="/menu" className={buttonStyles()}>
                 See the menu
@@ -262,7 +324,10 @@ export const AccountPage = () => {
         ) : account ? (
           <SignedIn account={account} />
         ) : (
-          <AuthPanel />
+          <>
+            <AuthPanel />
+            <DeviceOrders />
+          </>
         )}
       </Container>
       <CompactFooter />

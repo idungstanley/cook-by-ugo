@@ -44,4 +44,8 @@ export interface CartTotals {
   total: Pence
   amountToFreeDelivery: Pence
   freeDeliveryProgress: number
+  /** True once delivery is priced for a real postcode, such as a signed-in customer's. */
+  deliveryKnown?: boolean
+  /** False when the shop has no free delivery over an amount. */
+  freeDeliveryOn?: boolean
 }

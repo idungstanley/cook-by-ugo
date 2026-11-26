@@ -16,6 +16,7 @@ import { Route as MenuRouteImport } from './routes/menu'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as AccountResetPasswordRouteImport } from './routes/account.reset-password'
+import { Route as AccountVerifyEmailRouteImport } from './routes/account.verify-email'
 import { Route as TrackOrderIdRouteImport } from './routes/track.$orderId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,11 @@ const AccountResetPasswordRoute = AccountResetPasswordRouteImport.update({
   path: '/account/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountVerifyEmailRoute = AccountVerifyEmailRouteImport.update({
+  id: '/account/verify-email',
+  path: '/account/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackOrderIdRoute = TrackOrderIdRouteImport.update({
   id: '/track/$orderId',
   path: '/track/$orderId',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/menu': typeof MenuRoute
   '/privacy': typeof PrivacyRoute
   '/account/reset-password': typeof AccountResetPasswordRoute
+  '/account/verify-email': typeof AccountVerifyEmailRoute
   '/track/$orderId': typeof TrackOrderIdRoute
   '/account/': typeof AccountIndexRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/menu': typeof MenuRoute
   '/privacy': typeof PrivacyRoute
   '/account/reset-password': typeof AccountResetPasswordRoute
+  '/account/verify-email': typeof AccountVerifyEmailRoute
   '/track/$orderId': typeof TrackOrderIdRoute
   '/account': typeof AccountIndexRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/menu': typeof MenuRoute
   '/privacy': typeof PrivacyRoute
   '/account/reset-password': typeof AccountResetPasswordRoute
+  '/account/verify-email': typeof AccountVerifyEmailRoute
   '/track/$orderId': typeof TrackOrderIdRoute
   '/account/': typeof AccountIndexRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/privacy'
     | '/account/reset-password'
+    | '/account/verify-email'
     | '/track/$orderId'
     | '/account/'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/privacy'
     | '/account/reset-password'
+    | '/account/verify-email'
     | '/track/$orderId'
     | '/account'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/privacy'
     | '/account/reset-password'
+    | '/account/verify-email'
     | '/track/$orderId'
     | '/account/'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   MenuRoute: typeof MenuRoute
   PrivacyRoute: typeof PrivacyRoute
   AccountResetPasswordRoute: typeof AccountResetPasswordRoute
+  AccountVerifyEmailRoute: typeof AccountVerifyEmailRoute
   TrackOrderIdRoute: typeof TrackOrderIdRoute
   AccountIndexRoute: typeof AccountIndexRoute
 }
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/verify-email': {
+      id: '/account/verify-email'
+      path: '/account/verify-email'
+      fullPath: '/account/verify-email'
+      preLoaderRoute: typeof AccountVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/track/$orderId': {
       id: '/track/$orderId'
       path: '/track/$orderId'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   MenuRoute: MenuRoute,
   PrivacyRoute: PrivacyRoute,
   AccountResetPasswordRoute: AccountResetPasswordRoute,
+  AccountVerifyEmailRoute: AccountVerifyEmailRoute,
   TrackOrderIdRoute: TrackOrderIdRoute,
   AccountIndexRoute: AccountIndexRoute,
 }

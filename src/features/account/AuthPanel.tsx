@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/Button'
-import { TextField } from '@/components/ui/fields'
+import { PasswordField, TextField } from '@/components/ui/fields'
 import { PhoneField } from '@/features/checkout/components/PhoneField'
 import { DEFAULT_COUNTRY, formatPhone } from '@/features/checkout/phone'
 import { cn } from '@/lib/cn'
@@ -58,9 +58,8 @@ const SignInForm = ({ onForgot }: { onForgot: () => void }) => {
         error={errors.email?.message}
         {...register('email')}
       />
-      <TextField
+      <PasswordField
         label="Password"
-        type="password"
         autoComplete="current-password"
         error={errors.password?.message}
         {...register('password')}
@@ -134,9 +133,8 @@ const SignUpForm = () => {
         error={errors.email?.message}
         {...register('email')}
       />
-      <TextField
+      <PasswordField
         label="Password"
-        type="password"
         autoComplete="new-password"
         error={errors.password?.message}
         {...register('password')}

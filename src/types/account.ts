@@ -14,6 +14,8 @@ export interface Account {
   phone?: string
   address?: SavedAddress
   marketingOptIn: boolean
+  /** Set once the customer confirms their email, which also links their guest orders. */
+  emailVerifiedAt?: string
 }
 
 export interface AccountSession {

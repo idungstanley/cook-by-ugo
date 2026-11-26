@@ -11,6 +11,7 @@ import { Stars } from '@/features/reviews/StarRating'
 import { formatPrice } from '@/lib/format'
 import { useOrder } from '@/services/orders/orders.queries'
 import { useCartStore } from '@/stores/cart.store'
+import { useRecentOrdersStore } from '@/stores/recentOrders.store'
 import { ChangesPanel } from './ChangesPanel'
 import { OrderLines } from './OrderLines'
 
@@ -24,10 +25,19 @@ interface TrackOrderPageProps {
 export const TrackOrderPage = ({ orderId, trackingKey, paymentReturned }: TrackOrderPageProps) => {
   const { data: order, isPending, isError } = useOrder(orderId, trackingKey)
   const clearCart = useCartStore((state) => state.clear)
+  const rememberOrder = useRecentOrdersStore((state) => state.remember)
 
   useEffect(() => {
     if (paymentReturned) clearCart()
   }, [paymentReturned, clearCart])
+
+  // Any order opened here, including from an email, can be found again on the account page.
+  const orderNumber = order?.number
+  const placedAt = order?.createdAt
+  useEffect(() => {
+    if (orderNumber && placedAt)
+      rememberOrder({ id: orderId, number: orderNumber, trackingKey, placedAt })
+  }, [orderId, orderNumber, placedAt, trackingKey, rememberOrder])
 
   if (isPending) return <StatusMessage title="Finding your order..." />
   if (isError || !order) {
@@ -68,7 +78,7 @@ export const TrackOrderPage = ({ orderId, trackingKey, paymentReturned }: TrackO
             We are waiting for your bank to confirm the payment. This page updates by itself.
           </p>
         ) : (
-          <OrderTracker status={order.status} />
+          <OrderTracker status={order.status} refunded={order.refundedAmount} />
         )}
 
         {order.status === 'delivered' &&

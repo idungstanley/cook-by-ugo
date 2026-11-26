@@ -94,6 +94,8 @@ export interface PlacedOrder {
 
 export interface TrackedOrder extends OrderSummary {
   paymentStatus: string
+  /** Pence returned to the customer's card so far. */
+  refundedAmount?: number
   review: { rating: number; comment?: string; reply?: string } | null
   amendment: OrderAmendment | null
 }

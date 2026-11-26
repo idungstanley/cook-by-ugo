@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { CompactFooter } from '@/components/layout/CompactFooter'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
-import { TextField } from '@/components/ui/fields'
+import { PasswordField } from '@/components/ui/fields'
 import { useResetPassword } from '@/services/account/account.queries'
 
 export const ResetPasswordPage = ({ token }: { token: string }) => {
@@ -26,9 +26,8 @@ export const ResetPasswordPage = ({ token }: { token: string }) => {
           className="mx-auto flex w-full max-w-md flex-col gap-4 rounded-card bg-paper p-6 shadow-sm md:p-8"
         >
           <h1 className="text-3xl">Choose a new password</h1>
-          <TextField
+          <PasswordField
             label="New password"
-            type="password"
             autoComplete="new-password"
             value={password}
             error={tooShort ? 'Use at least 8 characters' : undefined}

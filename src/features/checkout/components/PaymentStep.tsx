@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useCartLines } from '@/hooks/useCartTotals'
@@ -6,6 +7,7 @@ import { useCreateOrder, useOrderQuote } from '@/services/orders/orders.queries'
 import { useDeliverySlots, useSiteInfo } from '@/services/site/site.queries'
 import { useCartStore } from '@/stores/cart.store'
 import { useCheckoutStore } from '@/stores/checkout.store'
+import { useRecentOrdersStore } from '@/stores/recentOrders.store'
 import type { OrderQuote, PlacedOrder } from '@/types'
 import { arrivalLabel } from '../arrival'
 import { StripePayment } from './StripePayment'
@@ -70,6 +72,8 @@ export const PaymentStep = () => {
   const delivery = useCheckoutStore((state) => state.delivery)
   const setStep = useCheckoutStore((state) => state.setStep)
   const completeOrder = useCheckoutStore((state) => state.completeOrder)
+  const rememberOrder = useRecentOrdersStore((state) => state.remember)
+  const navigate = useNavigate()
   const createOrder = useCreateOrder()
   // A failed attempt gets a fresh key, so trying again places a new order instead of the old one.
   const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID())
@@ -89,6 +93,19 @@ export const PaymentStep = () => {
       : `in about ${site?.leadMinutes ?? 45} minutes`
 
   const finish = (order: PlacedOrder) => {
+    rememberOrder({
+      id: order.order.id,
+      number: order.order.number,
+      trackingKey: order.trackingKey,
+      placedAt: Date.now(),
+    })
+    // The page behind the confirmation moves to the tracking page, so a refresh keeps the order.
+    void navigate({
+      to: '/track/$orderId',
+      params: { orderId: order.order.id },
+      search: { key: order.trackingKey },
+      replace: true,
+    })
     completeOrder({
       id: order.order.id,
       number: order.order.number,

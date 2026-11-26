@@ -3,6 +3,7 @@ import type { AppliedOffer, CartTotals } from '@/types'
 
 export const FreeDeliveryBar = ({ totals }: { totals: CartTotals }) => {
   const unlocked = totals.amountToFreeDelivery === 0
+  if (totals.freeDeliveryOn === false) return null
 
   return (
     <div>
@@ -39,13 +40,19 @@ export const CartTotalsSummary = ({ totals, appliedOffers = [] }: CartTotalsSumm
       </div>
     )}
     <div className="flex justify-between border-b border-line pb-3">
-      <dt className="text-muted">Delivery (estimate)</dt>
-      <dd className={totals.deliveryFee === 0 ? 'font-semibold text-ewedu' : ''}>
-        {totals.deliveryFee === 0 ? 'Free' : formatPrice(totals.deliveryFee)}
-      </dd>
+      <dt className="text-muted">Delivery</dt>
+      {totals.deliveryKnown ? (
+        <dd className={totals.deliveryFee === 0 ? 'font-semibold text-ewedu' : ''}>
+          {totals.deliveryFee === 0 ? 'Free' : formatPrice(totals.deliveryFee)}
+        </dd>
+      ) : (
+        <dd className="text-muted">Worked out at checkout</dd>
+      )}
     </div>
     <div className="flex items-center justify-between pt-1">
-      <dt className="font-display text-lg font-extrabold">Estimated total</dt>
+      <dt className="font-display text-lg font-extrabold">
+        {totals.deliveryKnown ? 'Total' : 'Total before delivery'}
+      </dt>
       <dd className="font-display text-2xl font-extrabold">{formatPrice(totals.total)}</dd>
     </div>
   </dl>

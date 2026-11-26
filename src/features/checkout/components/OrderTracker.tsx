@@ -1,9 +1,16 @@
 import { Tag } from '@/components/ui/Tag'
 import { ORDER_STAGES } from '@/constants/checkout'
 import { cn } from '@/lib/cn'
+import { formatPrice } from '@/lib/format'
 import type { OrderStatus } from '@/types'
 
-export const OrderTracker = ({ status }: { status: OrderStatus }) => {
+interface OrderTrackerProps {
+  status: OrderStatus
+  /** Pence refunded, so a cancelled order says exactly what is coming back. */
+  refunded?: number
+}
+
+export const OrderTracker = ({ status, refunded = 0 }: OrderTrackerProps) => {
   // While the customer decides about out-of-stock items, the order is still at the first step.
   const shownStatus = status === 'awaiting-customer' ? 'received' : status
   const currentIndex = ORDER_STAGES.findIndex((stage) => stage.status === shownStatus)
@@ -11,7 +18,9 @@ export const OrderTracker = ({ status }: { status: OrderStatus }) => {
   if (status === 'cancelled') {
     return (
       <p role="status" className="rounded-2xl bg-gold-soft p-4 text-sm font-semibold">
-        This order was cancelled. Any card payment has been refunded.
+        This order was cancelled.
+        {refunded > 0 &&
+          ` We have refunded ${formatPrice(refunded)} to your card. It can take 3 to 5 working days to show on your statement.`}
       </p>
     )
   }

@@ -19,8 +19,8 @@ interface DishCardProps {
 }
 
 /**
- * Laid out like an Uber Eats menu item: words on the left and a large square photo on the
- * right, so the food is the first thing you see. The whole card opens the dish.
+ * A large square photo on the left and the words on the right, so the food is the first thing
+ * you see. The whole card opens the dish.
  */
 export const DishCard = ({ dish, tag, description }: DishCardProps) => {
   const openDish = useUiStore((state) => state.openDish)
@@ -42,7 +42,23 @@ export const DishCard = ({ dish, tag, description }: DishCardProps) => {
           dish.soldOut && 'cursor-not-allowed opacity-60',
         )}
       >
-        <div className="flex min-w-0 flex-1 flex-col py-1 pl-1">
+        <div className="relative size-32 shrink-0 md:size-36">
+          <FoodImage
+            src={dish.image}
+            alt=""
+            loading="lazy"
+            className="size-full rounded-2xl transition duration-500 group-hover:scale-[1.03]"
+          />
+          {!dish.soldOut && (
+            <span
+              aria-hidden
+              className="absolute bottom-2 right-2 grid size-10 place-items-center rounded-full bg-paper text-cocoa shadow-float transition group-hover:scale-110 group-hover:bg-jollof group-hover:text-white"
+            >
+              <Plus className="size-5" strokeWidth={3} />
+            </span>
+          )}
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col py-1 pr-1">
           <div className="mb-1.5 flex flex-wrap gap-1">
             {offer && <Tag tone="jollof">{offer.label}</Tag>}
             {tag ? (
@@ -63,23 +79,6 @@ export const DishCard = ({ dish, tag, description }: DishCardProps) => {
             {Boolean(dish.kcal) && <span className="text-xs text-muted">{dish.kcal} kcal</span>}
           </p>
           {text && <p className="mt-1 line-clamp-2 text-sm leading-snug text-muted">{text}</p>}
-        </div>
-
-        <div className="relative size-32 shrink-0 md:size-36">
-          <FoodImage
-            src={dish.image}
-            alt=""
-            loading="lazy"
-            className="size-full rounded-2xl transition duration-500 group-hover:scale-[1.03]"
-          />
-          {!dish.soldOut && (
-            <span
-              aria-hidden
-              className="absolute bottom-2 right-2 grid size-10 place-items-center rounded-full bg-paper text-cocoa shadow-float transition group-hover:scale-110 group-hover:bg-jollof group-hover:text-white"
-            >
-              <Plus className="size-5" strokeWidth={3} />
-            </span>
-          )}
         </div>
       </button>
     </motion.article>

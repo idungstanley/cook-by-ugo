@@ -21,7 +21,8 @@ export interface SiteInfo {
   isOpen: boolean
   ordersPaused: boolean
   todayHours: string
-  freeDeliveryThreshold: number
+  /** Null when the shop has no free delivery over an amount. */
+  freeDeliveryThreshold: number | null
   /** Minutes from order to door for an order placed now. */
   leadMinutes: number
   stripePublishableKey: string | null

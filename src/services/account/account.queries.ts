@@ -72,3 +72,18 @@ export const useAccountOrders = (enabled: boolean) =>
     enabled,
     staleTime: 30_000,
   })
+
+/** Opened from the confirmation email. Works whether or not the customer is signed in here. */
+export const useVerifyEmail = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApi.verifyEmail,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.account })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.accountOrders })
+    },
+  })
+}
+
+export const useResendVerification = () =>
+  useMutation({ mutationFn: accountApi.resendVerification })

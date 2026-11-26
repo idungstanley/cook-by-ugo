@@ -27,4 +27,6 @@ export const accountApi = {
   forgotPassword: (email: string) => accountHttp.post<{ ok: true }>('/forgot-password', { email }),
   resetPassword: (input: { token: string; password: string }) =>
     accountHttp.post<AccountSession>('/reset-password', input),
+  verifyEmail: (token: string) => accountHttp.post<Account>('/verify-email', { token }),
+  resendVerification: () => accountHttp.post<{ ok: true }>('/resend-verification'),
 }
