@@ -3,7 +3,8 @@ export type Pence = number
 
 export type DishBadge = 'Popular' | 'Spicy'
 
-export type CategoryId = 'rice-swallow' | 'grills-protein' | 'sides-snacks' | 'drinks'
+/** Staff create categories in the admin, so any id can appear. */
+export type CategoryId = string
 
 export interface Category {
   id: CategoryId

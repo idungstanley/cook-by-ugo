@@ -23,8 +23,6 @@ interface MenuSearch {
   category?: CategoryId
 }
 
-const CATEGORY_IDS: CategoryId[] = ['rice-swallow', 'grills-protein', 'sides-snacks', 'drinks']
-
 const MenuPage = () => {
   const { category } = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
@@ -102,7 +100,9 @@ const MenuPage = () => {
 
 export const Route = createFileRoute('/menu')({
   validateSearch: (search: Record<string, unknown>): MenuSearch => ({
-    category: CATEGORY_IDS.find((id) => id === search.category),
+    // Any category id is allowed, because staff add their own. An id that is not on the menu
+    // just shows every dish.
+    category: typeof search.category === 'string' && search.category ? search.category : undefined,
   }),
   loader: ({ context: { queryClient } }) =>
     Promise.all([

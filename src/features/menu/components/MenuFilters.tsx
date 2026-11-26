@@ -36,19 +36,22 @@ export const MenuFilters = ({
       <Chip active={!activeCategory} onClick={() => onCategoryChange(undefined)}>
         All <span className="max-md:hidden">{counts.total}</span>
       </Chip>
-      {categories.map((category) => (
-        <Chip
-          key={category.id}
-          active={activeCategory === category.id}
-          onClick={() => onCategoryChange(category.id)}
-          className="md:border-transparent"
-        >
-          <span className="md:hidden">{category.shortName}</span>
-          <span className="max-md:hidden">
-            {category.name} {counts.byCategory.get(category.id)}
-          </span>
-        </Chip>
-      ))}
+      {/* A category with no dishes yet would lead nowhere, so it stays hidden. */}
+      {categories
+        .filter(({ id }) => counts.byCategory.has(id))
+        .map((category) => (
+          <Chip
+            key={category.id}
+            active={activeCategory === category.id}
+            onClick={() => onCategoryChange(category.id)}
+            className="md:border-transparent"
+          >
+            <span className="md:hidden">{category.shortName}</span>
+            <span className="max-md:hidden">
+              {category.name} {counts.byCategory.get(category.id)}
+            </span>
+          </Chip>
+        ))}
     </div>
   </div>
 )

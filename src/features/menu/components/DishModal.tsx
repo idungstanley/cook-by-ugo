@@ -9,20 +9,18 @@ import { Tag } from '@/components/ui/Tag'
 import { getNextGroup } from '@/features/menu/dishSelection'
 import { useDishSelection } from '@/hooks/useDishSelection'
 import { formatPrice } from '@/lib/format'
-import { useDishes, useFavourites, useOptionGroups } from '@/services/menu/menu.queries'
+import {
+  useCategories,
+  useDishes,
+  useFavourites,
+  useOptionGroups,
+} from '@/services/menu/menu.queries'
 import { useDishOffer } from '@/services/offers/offers.queries'
 import { useCartStore } from '@/stores/cart.store'
 import { useReplacementStore } from '@/stores/replacement.store'
 import { useUiStore } from '@/stores/ui.store'
-import type { Category, Dish, OptionGroup } from '@/types'
+import type { Dish, OptionGroup } from '@/types'
 import { OptionGroupField } from './OptionGroupField'
-
-const CATEGORY_LABELS: Partial<Record<Category['id'], string>> = {
-  'rice-swallow': 'Rice & swallow',
-  'grills-protein': 'Grills & protein',
-  'sides-snacks': 'Sides & snacks',
-  drinks: 'Drinks',
-}
 
 interface DishFormProps {
   dish: Dish
@@ -34,6 +32,7 @@ interface DishFormProps {
 const HIGHLIGHT_MS = 1600
 
 const DishForm = ({ dish, groups, isMostOrdered, onClose }: DishFormProps) => {
+  const { data: categories } = useCategories()
   const addToCart = useCartStore((state) => state.addItem)
   const replacing = useReplacementStore((state) => Boolean(state.orderId))
   const addReplacement = useReplacementStore((state) => state.addItem)
@@ -127,7 +126,7 @@ const DishForm = ({ dish, groups, isMostOrdered, onClose }: DishFormProps) => {
         <div className="flex flex-col gap-6 px-5 pb-4 pt-2 md:flex-1 md:overflow-y-auto md:px-8 md:pt-8">
           <div>
             <p className="hidden text-xs font-bold uppercase tracking-[0.16em] text-jollof md:block">
-              {CATEGORY_LABELS[dish.categoryId] ?? 'Menu'}
+              {categories?.find(({ id }) => id === dish.categoryId)?.name ?? 'Menu'}
             </p>
             <h2 className="pr-12 text-3xl md:mt-1 md:text-4xl">{dish.name}</h2>
             {(dish.longDescription ?? dish.description) && (

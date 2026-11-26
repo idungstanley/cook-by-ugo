@@ -12,17 +12,25 @@ export const useMenuSections = (categoryId: CategoryId | undefined, searchTerm: 
   const sections = useMemo<MenuSection[]>(() => {
     const term = searchTerm.trim().toLowerCase()
 
-    return (categories ?? [])
-      .filter((category) => !categoryId || category.id === categoryId)
-      .map((category) => ({
-        category,
-        dishes: (dishes ?? []).filter(
-          (dish) =>
-            dish.categoryId === category.id &&
-            (!term || `${dish.name} ${dish.description}`.toLowerCase().includes(term)),
-        ),
-      }))
-      .filter((section) => section.dishes.length > 0)
+    return (
+      (categories ?? [])
+        // An unknown id, such as a link to a category that was since deleted, shows everything.
+        .filter(
+          (category) =>
+            !categoryId ||
+            !categories?.some(({ id }) => id === categoryId) ||
+            category.id === categoryId,
+        )
+        .map((category) => ({
+          category,
+          dishes: (dishes ?? []).filter(
+            (dish) =>
+              dish.categoryId === category.id &&
+              (!term || `${dish.name} ${dish.description}`.toLowerCase().includes(term)),
+          ),
+        }))
+        .filter((section) => section.dishes.length > 0)
+    )
   }, [categories, dishes, categoryId, searchTerm])
 
   const counts = useMemo(() => {
