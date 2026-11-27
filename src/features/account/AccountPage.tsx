@@ -11,6 +11,7 @@ import { Container } from '@/components/ui/Container'
 import { TextField } from '@/components/ui/fields'
 import { StatusMessage } from '@/components/ui/StatusMessage'
 import { Tag } from '@/components/ui/Tag'
+import { AddressFinder } from '@/features/address/AddressFinder'
 import { PhoneField } from '@/features/checkout/components/PhoneField'
 import { formatPhone, splitPhone } from '@/features/checkout/phone'
 import { formatPrice } from '@/lib/format'
@@ -126,6 +127,14 @@ const ProfileForm = ({ account }: { account: Account }) => {
         error={errors.phoneNumber?.message}
         countryProps={register('phoneCountry')}
         numberProps={register('phoneNumber')}
+      />
+      <AddressFinder
+        onPick={(address) => {
+          const options = { shouldDirty: true, shouldValidate: true }
+          setValue('line1', address.line1, options)
+          setValue('city', address.city, options)
+          setValue('postcode', address.postcode, options)
+        }}
       />
       <TextField label="House number and street" {...register('line1')} />
       <div className="grid grid-cols-[1.6fr_1fr] gap-3">

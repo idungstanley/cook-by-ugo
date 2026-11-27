@@ -4,6 +4,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/Button'
 import { PasswordField, TextField } from '@/components/ui/fields'
+import { AddressFinder } from '@/features/address/AddressFinder'
 import { PhoneField } from '@/features/checkout/components/PhoneField'
 import { DEFAULT_COUNTRY, formatPhone } from '@/features/checkout/phone'
 import { cn } from '@/lib/cn'
@@ -90,6 +91,7 @@ const SignUpForm = () => {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
@@ -144,6 +146,12 @@ const SignUpForm = () => {
         error={errors.phoneNumber?.message}
         countryProps={register('phoneCountry')}
         numberProps={{ placeholder: '07400 123456', ...register('phoneNumber') }}
+      />
+      <AddressFinder
+        onPick={(address) => {
+          setValue('line1', address.line1, { shouldValidate: true })
+          setValue('postcode', address.postcode, { shouldValidate: true })
+        }}
       />
       <TextField
         label="House number and street"

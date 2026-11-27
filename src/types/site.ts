@@ -50,6 +50,13 @@ export interface PostcodeCheck {
   addresses: AddressOption[]
 }
 
+/** Royal Mail addresses for a postcode, wherever it is. */
+export interface AddressLookup {
+  postcode: string
+  city: string
+  addresses: AddressOption[]
+}
+
 /** A time for a scheduled order. `at` is when the kitchen starts; the food arrives later. */
 export interface DeliverySlot {
   at: number
