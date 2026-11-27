@@ -194,8 +194,8 @@ export const PaymentStep = () => {
                 ? 'Getting payment ready...'
                 : `Continue to pay ${quote.data ? formatPrice(quote.data.total) : ''}`}
             </Button>
-            <Button variant="outline" size="lg" fullWidth onClick={backToDelivery}>
-              Back
+            <Button variant="light" size="lg" fullWidth onClick={backToDelivery}>
+              <ArrowLeft className="size-4" aria-hidden /> Back
             </Button>
             <p className="text-xs text-muted">Card, Apple Pay or Google Pay</p>
           </div>
