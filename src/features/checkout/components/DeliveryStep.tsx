@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { SelectField, TextAreaField, TextField } from '@/components/ui/fields'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
+import { AddressSearch } from '@/features/address/AddressSearch'
 import { useAccount } from '@/services/account/account.queries'
 import { siteApi } from '@/services/site/site.api'
 import { useDeliverySlots, useSiteInfo } from '@/services/site/site.queries'
@@ -170,6 +171,23 @@ export const DeliveryStep = () => {
       />
 
       <h3 className="mt-2 text-xl">Where should we bring it?</h3>
+      {site?.addressSearch && (
+        <AddressSearch
+          onPick={(address) => {
+            // Fills the boxes, then checks the postcode against the delivery area as usual.
+            setValue('postcode', address.postcode)
+            setValue('postcodeConfirmed', false)
+            setCheck(null)
+            clearErrors('postcode')
+            lookup.mutate(address.postcode, {
+              onSuccess: () => {
+                setAddressChoice(NOT_LISTED)
+                setValue('address', address.line1, { shouldValidate: true })
+              },
+            })
+          }}
+        />
+      )}
       <div>
         {/* Errors sit under the whole row, so the button always lines up with the input. */}
         <div className="flex items-end gap-2">

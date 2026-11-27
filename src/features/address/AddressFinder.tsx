@@ -4,6 +4,7 @@ import { useId, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { siteApi } from '@/services/site/site.api'
 import { useSiteInfo } from '@/services/site/site.queries'
+import { AddressSearch } from './AddressSearch'
 
 export interface FoundAddress {
   line1: string
@@ -26,6 +27,7 @@ export const AddressFinder = ({ onPick }: { onPick: (address: FoundAddress) => v
   const [error, setError] = useState<string | null>(null)
   const lookup = useMutation({ mutationFn: siteApi.findAddresses })
 
+  if (site?.addressSearch) return <AddressSearch onPick={onPick} />
   if (!site?.addressLookup) return null
 
   const find = () => {

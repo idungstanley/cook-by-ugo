@@ -30,6 +30,8 @@ export interface SiteInfo {
   stripePublishableKey: string | null
   /** Whether checkout can list Royal Mail addresses for a postcode. */
   addressLookup: boolean
+  /** Google type-ahead address search is set up. */
+  addressSearch?: boolean
 }
 
 export interface AddressOption {
