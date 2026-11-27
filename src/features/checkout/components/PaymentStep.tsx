@@ -1,4 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
+import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useCartLines } from '@/hooks/useCartTotals'
@@ -143,8 +144,19 @@ export const PaymentStep = () => {
     createOrder.error?.message ??
     (placed && !publishableKey ? 'Card payments are not set up yet. Please try again later.' : null)
 
+  const backToDelivery = () => setStep('delivery')
+  const closed = /closed right now|schedule/i.test(errorMessage ?? '')
+
   return (
     <div className="flex flex-1 flex-col gap-4 px-5 pb-6 sm:px-8">
+      <button
+        type="button"
+        onClick={backToDelivery}
+        className="inline-flex items-center gap-1.5 self-start rounded-full border border-line bg-paper px-4 py-2 text-sm font-semibold transition hover:border-cocoa"
+      >
+        <ArrowLeft className="size-4" aria-hidden /> Back to delivery details
+      </button>
+
       <OrderSummary quote={quote.data} eta={eta} />
 
       {placed?.clientSecret && publishableKey ? (
@@ -162,11 +174,16 @@ export const PaymentStep = () => {
       ) : (
         <>
           {errorMessage && (
-            <p role="alert" className="text-sm font-semibold text-jollof">
-              {errorMessage}
-            </p>
+            <div role="alert" className="flex flex-col items-start gap-3">
+              <p className="text-sm font-semibold text-jollof">{errorMessage}</p>
+              {closed && (
+                <Button variant="outline" onClick={backToDelivery}>
+                  <ArrowLeft className="size-4" aria-hidden /> Choose a delivery time
+                </Button>
+              )}
+            </div>
           )}
-          <div className="mt-auto pt-2 text-center">
+          <div className="mt-auto flex flex-col gap-2 pt-2 text-center">
             <Button
               size="lg"
               fullWidth
@@ -177,16 +194,10 @@ export const PaymentStep = () => {
                 ? 'Getting payment ready...'
                 : `Continue to pay ${quote.data ? formatPrice(quote.data.total) : ''}`}
             </Button>
-            <p className="mt-2 text-xs text-muted">
-              Card, Apple Pay or Google Pay ·{' '}
-              <button
-                type="button"
-                className="underline-offset-2 hover:underline"
-                onClick={() => setStep('delivery')}
-              >
-                Back to delivery
-              </button>
-            </p>
+            <Button variant="outline" size="lg" fullWidth onClick={backToDelivery}>
+              Back
+            </Button>
+            <p className="text-xs text-muted">Card, Apple Pay or Google Pay</p>
           </div>
         </>
       )}
