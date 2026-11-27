@@ -18,7 +18,6 @@ import { siteApi } from '@/services/site/site.api'
 import {
   useAccount,
   useAccountOrders,
-  useResendVerification,
   useSignOut,
   useUpdateProfile,
 } from '@/services/account/account.queries'
@@ -210,29 +209,6 @@ const OrderRow = ({ order }: { order: AccountOrder }) => (
   </li>
 )
 
-/** Until the email is confirmed, guest orders with it stay hidden, so nobody sees someone else's. */
-const ConfirmEmailBanner = ({ email }: { email: string }) => {
-  const resend = useResendVerification()
-  return (
-    <div role="status" className="rounded-2xl bg-gold-soft p-4 text-sm">
-      <p className="font-semibold">Confirm your email to see all your orders</p>
-      <p className="mt-1">
-        We sent a link to {email}. Once you tap it, orders you placed with this email before signing
-        up will show here too.
-      </p>
-      <Button
-        variant="outline"
-        size="sm"
-        className="mt-3"
-        disabled={resend.isPending || resend.isSuccess}
-        onClick={() => resend.mutate()}
-      >
-        {resend.isSuccess ? 'Sent. Check your inbox' : 'Send the link again'}
-      </Button>
-    </div>
-  )
-}
-
 /** Orders placed on this device, for guests who closed or refreshed the page. */
 const DeviceOrders = () => {
   const orders = useRecentOrdersStore((state) => state.orders)
@@ -277,7 +253,6 @@ const SignedIn = ({ account }: { account: Account }) => {
           <h1 className="text-4xl">Hi {account.name.split(' ')[0]}</h1>
           <p className="text-sm text-muted">{account.email}</p>
         </div>
-        {!account.emailVerifiedAt && <ConfirmEmailBanner email={account.email} />}
         <ProfileForm account={account} />
         <Button variant="ghost" className="self-start" onClick={() => signOut.mutate()}>
           Sign out
@@ -296,11 +271,7 @@ const SignedIn = ({ account }: { account: Account }) => {
         ) : (
           <StatusMessage
             title="No orders yet"
-            body={
-              account.emailVerifiedAt
-                ? 'Orders placed with your email will show here.'
-                : 'Orders you place while signed in will show here.'
-            }
+            body="Your orders show here, including earlier ones placed with the same email and phone number."
             action={
               <Link to="/menu" className={buttonStyles()}>
                 See the menu

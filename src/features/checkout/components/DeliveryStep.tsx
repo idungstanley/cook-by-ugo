@@ -277,14 +277,15 @@ export const DeliveryStep = () => {
 
       {timing === 'scheduled' && (
         <SelectField
-          label="Choose a time"
+          label="When should we start cooking?"
           error={errors.scheduledFor?.message}
           {...register('scheduledFor')}
         >
-          <option value="">{slots?.length ? 'Select a slot' : 'No slots left today'}</option>
-          {slots?.map(({ at, label }) => (
+          <option value="">{slots?.length ? 'Select a time' : 'No times left today'}</option>
+          {slots?.map(({ at, label, arrivalLabel }) => (
             <option key={at} value={at}>
               {label}
+              {arrivalLabel ? ` · arrives about ${arrivalLabel.replace('Today, ', '')}` : ''}
             </option>
           ))}
         </SelectField>

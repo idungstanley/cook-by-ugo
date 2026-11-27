@@ -87,10 +87,10 @@ export const PaymentStep = () => {
   if (!delivery) return null
 
   const { postcode, timing, ...details } = delivery
-  const slotLabel = slots?.find(({ at }) => at === delivery.scheduledFor)?.label
+  const slot = slots?.find(({ at }) => at === delivery.scheduledFor)
   const eta =
-    timing === 'scheduled' && slotLabel
-      ? slotLabel.replace('Today, ', 'today at ')
+    timing === 'scheduled' && slot?.arrivalLabel
+      ? `about ${slot.arrivalLabel.replace('Today, ', 'today at ')}`
       : `in about ${site?.leadMinutes ?? 45} minutes`
 
   const finish = (order: PlacedOrder) => {

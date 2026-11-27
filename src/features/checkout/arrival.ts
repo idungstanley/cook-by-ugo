@@ -15,11 +15,14 @@ const weekdayFormat = new Intl.DateTimeFormat('en-GB', {
   weekday: 'long',
 })
 
-/** "Today, 12:00pm": the chosen slot for scheduled orders, otherwise order time plus the wait. */
+/**
+ * "Today, 12:00pm": when the food arrives. That is the order time, or for a scheduled order the
+ * time the kitchen starts, plus preparation and delivery.
+ */
 export const arrivalLabel = (
   order: Pick<OrderSummary, 'createdAt' | 'etaMinutes' | 'scheduledFor'>,
 ) => {
-  const at = new Date(order.scheduledFor ?? order.createdAt + order.etaMinutes * 60_000)
+  const at = new Date((order.scheduledFor ?? order.createdAt) + order.etaMinutes * 60_000)
   const day =
     dayFormat.format(at) === dayFormat.format(new Date()) ? 'Today' : weekdayFormat.format(at)
   return `${day}, ${timeFormat.format(at).replace(' ', '')}`

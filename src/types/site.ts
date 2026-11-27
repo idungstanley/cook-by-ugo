@@ -23,6 +23,8 @@ export interface SiteInfo {
   todayHours: string
   /** Null when the shop has no free delivery over an amount. */
   freeDeliveryThreshold: number | null
+  /** Customers sign in or create an account before they can order. */
+  accountRequired?: boolean
   /** Minutes from order to door for an order placed now. */
   leadMinutes: number
   stripePublishableKey: string | null
@@ -48,7 +50,10 @@ export interface PostcodeCheck {
   addresses: AddressOption[]
 }
 
+/** A time for a scheduled order. `at` is when the kitchen starts; the food arrives later. */
 export interface DeliverySlot {
   at: number
   label: string
+  arrivesAt?: number
+  arrivalLabel?: string
 }
